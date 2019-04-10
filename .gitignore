@@ -1,0 +1,5 @@
+*.db
+release
+.vscode
+.idea
+*.key
