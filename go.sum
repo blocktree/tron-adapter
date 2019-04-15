@@ -18,6 +18,8 @@ github.com/beego/x2j v0.0.0-20131220205130-a0352aadc542/go.mod h1:kSeGC/p1AbBiEp
 github.com/belogik/goes v0.0.0-20151229125003-e54d722c3aff/go.mod h1:PhH1ZhyCzHKt4uAasyx+ljRCgoezetRNf59CUtwUkqY=
 github.com/blocktree/go-owcdrivers v1.0.0 h1:dMxbi+In7On3fq/2cfaO+IdKY35l++4cPFe6jcdJanM=
 github.com/blocktree/go-owcdrivers v1.0.0/go.mod h1:AzbIxzzRcSszV/XwOiu83QqKuGTuWyCdCrVfGNt2bk8=
+github.com/blocktree/go-owcdrivers v1.0.2 h1:rFUL4wexwn1nT++SCCXPFOjV2WfBJGHyclS8UW/sElk=
+github.com/blocktree/go-owcdrivers v1.0.2/go.mod h1:AzbIxzzRcSszV/XwOiu83QqKuGTuWyCdCrVfGNt2bk8=
 github.com/blocktree/go-owcrypt v1.0.0 h1:u3B59ZjmZ6vB8NrIicUvKKiiDY2oeJCInWsEq1swwSY=
 github.com/blocktree/go-owcrypt v1.0.0/go.mod h1:5FCinL/4XVEqbmAFTOUgfMJVNJEw6WzVy624qsxzZC8=
 github.com/blocktree/openwallet v1.2.1 h1:t+AsfEZvBGxkhUYZWcOsuAoeFdNxSMJ9I1VOPqplPGM=

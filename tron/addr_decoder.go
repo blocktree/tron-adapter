@@ -72,7 +72,7 @@ func DecodeAddress(addr string, isTestnet bool) (string, []byte, error) {
 	if err != nil {
 		return "", nil, err
 	}
-	toAddressBytes = append(codeType.Prefix(), toAddressBytes...)
+	toAddressBytes = append(codeType.Prefix, toAddressBytes...)
 	return hex.EncodeToString(toAddressBytes), toAddressBytes, nil
 }
 

@@ -390,7 +390,7 @@ func (wm *WalletManager) validSignedTokenTransaction(txHash []byte, signature []
 		return fmt.Errorf("verify SignedTransactionRef failed:verify signature failed")
 	}
 	pkHash := owcrypt.Hash(pkBytes, 0, owcrypt.HASH_ALG_KECCAK256)[12:32]
-	pkgenAddress := append(codeType.Prefix(), pkHash...)
+	pkgenAddress := append(codeType.Prefix, pkHash...)
 	pkgenAddressHex := hex.EncodeToString(pkgenAddress)
 	if pkgenAddressHex != ownerAddressHex {
 		return fmt.Errorf("verify SignedTransactionRef failed: signed address is not the owner address")
