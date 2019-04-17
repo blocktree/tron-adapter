@@ -35,7 +35,6 @@ func init() {
 	// tw.Config.ServerAPI = "http://127.0.0.1:18090"
 	//tw.Config.ServerAPI = "http://192.168.2.194:18090"
 	//tw.Config.ServerAPI = "https://api.trongrid.io"
-	tw.Config.ServerAPI = "http://47.106.102.2:18090"
 	tw.Config.IsTestNet = false
 	// tw.Config.RpcUser = "walletUser"
 	// tw.Config.RpcPassword = "walletPassword2017"

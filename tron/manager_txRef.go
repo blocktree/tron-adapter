@@ -279,6 +279,11 @@ func (wm *WalletManager) createAssetsTransaction(message proto.Message, contract
 		Expiration:    timestamp + 10*60*60*60,
 		//FeeLimit:      FeeLimit,
 	}
+
+	if wm.Config.FeeLimit > 0 {
+		txRaw.FeeLimit = wm.Config.FeeLimit
+	}
+
 	tx := &core.Transaction{
 		RawData: txRaw,
 	}
@@ -554,6 +559,11 @@ func (wm *WalletManager) BroadcastTransaction(raw string) (string, error) {
 		"timestamp":       rawData.GetTimestamp(),
 		"contract":        contracts,
 	}
+
+	if wm.Config.FeeLimit > 0 {
+		raw_data["fee_limit"] = wm.Config.FeeLimit
+	}
+
 	params := req.Param{
 		"signature": signature,
 		"txID":      txID,

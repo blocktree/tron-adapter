@@ -105,6 +105,8 @@ type WalletConfig struct {
 	CoinDecimal decimal.Decimal
 	//后台数据源类型
 	RPCServerType int
+	//FeeLimit
+	FeeLimit int64
 }
 
 //NewConfig Create config instance
@@ -188,6 +190,8 @@ sumAddress = ""
 threshold = ""
 # summary task timer cycle time, sample: 1m , 30s, 3m20s etc
 cycleSeconds = ""
+# feeLimit, the maximum energy is 1000000000
+feeLimit = 10000000
 `
 
 	//创建目录

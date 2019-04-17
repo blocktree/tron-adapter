@@ -48,6 +48,7 @@ func (wm *WalletManager) LoadConfig() error {
 	wm.Config.RPCUser = c.String("rpcUser")
 	wm.Config.RPCPassword = c.String("rpcPassword")
 	wm.Config.NodeInstallPath = c.String("nodeInstallPath")
+	wm.Config.FeeLimit, _ = c.Int64("feeLimit")
 	wm.Config.IsTestNet, _ = c.Bool("isTestNet")
 	if wm.Config.IsTestNet {
 		wm.Config.WalletDataPath = c.String("testNetDataPath")
@@ -76,6 +77,7 @@ func (wm *WalletManager) LoadAssetsConfig(c config.Configer) error {
 	//wm.Config.RPCPassword = c.String("rpcPassword")
 	//wm.Config.NodeInstallPath = c.String("nodeInstallPath")
 	wm.Config.IsTestNet, _ = c.Bool("isTestNet")
+	wm.Config.FeeLimit, _ = c.Int64("feeLimit")
 	//if wm.Config.IsTestNet {
 	//	wm.Config.WalletDataPath = c.String("testNetDataPath")
 	//} else {

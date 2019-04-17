@@ -18,8 +18,8 @@ package tron
 import (
 	"encoding/hex"
 	"fmt"
-	"github.com/blocktree/tron-adapter/tron/grpc-gateway/core"
 	"github.com/blocktree/openwallet/common"
+	"github.com/blocktree/tron-adapter/tron/grpc-gateway/core"
 	"github.com/golang/protobuf/proto"
 	"math/big"
 	"sort"
@@ -511,8 +511,6 @@ func (decoder *TransactionDecoder) CreateSimpleSummaryRawTransaction(wrapper ope
 			decoder.wm.Log.Std.Error("GetTransactionFeeEstimated from[%v] -> to[%v] failed, err=%v", addrBalance.Address, sumRawTx.SummaryAddress, createErr)
 			return nil, createErr
 		}
-
-
 
 		//减去手续费
 		//sumAmount = sumAmount.Sub(fee.Fee)
