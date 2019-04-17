@@ -12,5 +12,7 @@ openwtester包下的测试用例已经集成了openwallet钱包体系，创建co
 ServerAPI = "http://127.0.0.1:18090"
 # Is network test?
 isTestNet = false
+# feeLimit, the maximum energy is 1000000000
+feeLimit = 10000000
 
 ```
