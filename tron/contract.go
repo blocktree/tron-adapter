@@ -206,6 +206,7 @@ func (wm *WalletManager) GetTRC10Balance(address string, tokenID string) (int64,
 }
 
 type ContractDecoder struct {
+	*openwallet.SmartContractDecoderBase
 	wm *WalletManager
 }
 

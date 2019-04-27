@@ -97,7 +97,7 @@ func TestTRC20TransferData(t *testing.T) {
 }
 
 func TestWalletManager_GetContract(t *testing.T) {
-	r, err := tw.GetContractInfo("TMWkPhsb1dnkAVNy8ej53KrFNGWy9BJrfu")
+	r, err := tw.GetContractInfo("THvZvKPLHKLJhEFYKiyqj6j8G8nGgfg7ur")
 	if err != nil {
 		t.Errorf("GetContract failed: %v\n", err)
 		return

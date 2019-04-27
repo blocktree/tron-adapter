@@ -166,14 +166,14 @@ func (decoder *TransactionDecoder) CreateSimpleTransaction(wrapper openwallet.Wa
 	}
 
 	//最后创建交易单
-	err = decoder.createRawTransaction(
+	createTxErr := decoder.createRawTransaction(
 		wrapper,
 		rawTx,
 		findAddrBalance,
 		feeInfo,
 		"")
-	if err != nil {
-		return err
+	if createTxErr != nil {
+		return createTxErr
 	}
 
 	return nil
@@ -280,14 +280,14 @@ func (decoder *TransactionDecoder) CreateTokenTransaction(wrapper openwallet.Wal
 	}
 
 	//最后创建交易单
-	err = decoder.createRawTransaction(
+	createTxErr := decoder.createRawTransaction(
 		wrapper,
 		rawTx,
 		findAddrBalance,
 		feeInfo,
 		"")
-	if err != nil {
-		return err
+	if createTxErr != nil {
+		return createTxErr
 	}
 
 	return nil
@@ -442,6 +442,30 @@ func (decoder *TransactionDecoder) SubmitRawTransaction(wrapper openwallet.Walle
 
 //CreateSummaryRawTransaction 创建汇总交易，返回原始交易单数组
 func (decoder *TransactionDecoder) CreateSummaryRawTransaction(wrapper openwallet.WalletDAI, sumRawTx *openwallet.SummaryRawTransaction) ([]*openwallet.RawTransaction, error) {
+	var (
+		rawTxWithErrArray []*openwallet.RawTransactionWithError
+		rawTxArray        = make([]*openwallet.RawTransaction, 0)
+		err               error
+	)
+	if sumRawTx.Coin.IsContract {
+		rawTxWithErrArray, err = decoder.CreateTokenSummaryRawTransaction(wrapper, sumRawTx)
+	} else {
+		rawTxWithErrArray, err = decoder.CreateSimpleSummaryRawTransaction(wrapper, sumRawTx)
+	}
+	if err != nil {
+		return nil, err
+	}
+	for _, rawTxWithErr := range rawTxWithErrArray {
+		if rawTxWithErr.Error != nil {
+			continue
+		}
+		rawTxArray = append(rawTxArray, rawTxWithErr.RawTx)
+	}
+	return rawTxArray, nil
+}
+
+//CreateSummaryRawTransactionWithError 创建汇总交易，返回能原始交易单数组（包含带错误的原始交易单）
+func (decoder *TransactionDecoder) CreateSummaryRawTransactionWithError(wrapper openwallet.WalletDAI, sumRawTx *openwallet.SummaryRawTransaction) ([]*openwallet.RawTransactionWithError, error) {
 	if sumRawTx.Coin.IsContract {
 		return decoder.CreateTokenSummaryRawTransaction(wrapper, sumRawTx)
 	} else {
@@ -450,10 +474,10 @@ func (decoder *TransactionDecoder) CreateSummaryRawTransaction(wrapper openwalle
 }
 
 //CreateSimpleSummaryRawTransaction 创建主币汇总交易
-func (decoder *TransactionDecoder) CreateSimpleSummaryRawTransaction(wrapper openwallet.WalletDAI, sumRawTx *openwallet.SummaryRawTransaction) ([]*openwallet.RawTransaction, error) {
+func (decoder *TransactionDecoder) CreateSimpleSummaryRawTransaction(wrapper openwallet.WalletDAI, sumRawTx *openwallet.SummaryRawTransaction) ([]*openwallet.RawTransactionWithError, error) {
 
 	var (
-		rawTxArray      = make([]*openwallet.RawTransaction, 0)
+		rawTxArray      = make([]*openwallet.RawTransactionWithError, 0)
 		accountID       = sumRawTx.Account.AccountID
 		minTransfer     = common.StringNumToBigIntWithExp(sumRawTx.MinTransfer, Decimals)
 		retainedBalance = common.StringNumToBigIntWithExp(sumRawTx.RetainedBalance, Decimals)
@@ -533,18 +557,19 @@ func (decoder *TransactionDecoder) CreateSimpleSummaryRawTransaction(wrapper ope
 			RawHex:   rawHex,
 		}
 
-		createErr = decoder.createRawTransaction(
+		createTxErr := decoder.createRawTransaction(
 			wrapper,
 			rawTx,
 			&AddrBalance{Address: addrBalance.Address, TronBalance: addrBalance_BI},
 			fee,
 			"")
-		if createErr != nil {
-			return nil, createErr
+		rawTxWithErr := &openwallet.RawTransactionWithError{
+			RawTx: rawTx,
+			Error: createTxErr,
 		}
 
 		//创建成功，添加到队列
-		rawTxArray = append(rawTxArray, rawTx)
+		rawTxArray = append(rawTxArray, rawTxWithErr)
 
 	}
 
@@ -552,14 +577,25 @@ func (decoder *TransactionDecoder) CreateSimpleSummaryRawTransaction(wrapper ope
 }
 
 //CreateTokenSummaryRawTransaction 创建代币汇总交易
-func (decoder *TransactionDecoder) CreateTokenSummaryRawTransaction(wrapper openwallet.WalletDAI, sumRawTx *openwallet.SummaryRawTransaction) ([]*openwallet.RawTransaction, error) {
+func (decoder *TransactionDecoder) CreateTokenSummaryRawTransaction(wrapper openwallet.WalletDAI, sumRawTx *openwallet.SummaryRawTransaction) ([]*openwallet.RawTransactionWithError, error) {
 
 	var (
-		rawTxArray      = make([]*openwallet.RawTransaction, 0)
+		rawTxArray      = make([]*openwallet.RawTransactionWithError, 0)
 		accountID       = sumRawTx.Account.AccountID
 		minTransfer     = common.StringNumToBigIntWithExp(sumRawTx.MinTransfer, Decimals)
 		retainedBalance = common.StringNumToBigIntWithExp(sumRawTx.RetainedBalance, Decimals)
+		feesSupportAccount *openwallet.AssetsAccount
 	)
+
+	// 如果有提供手续费账户，检查账户是否存在
+	if feesAcount := sumRawTx.FeesSupportAccount; feesAcount != nil {
+		account, supportErr := wrapper.GetAssetsAccountInfo(feesAcount.AccountID)
+		if supportErr != nil {
+			return nil, openwallet.Errorf(openwallet.ErrAccountNotFound, "can not find fees support account")
+		}
+
+		feesSupportAccount = account
+	}
 
 	tokenDecimals := int32(sumRawTx.Coin.Contract.Decimals)
 
@@ -591,6 +627,7 @@ func (decoder *TransactionDecoder) CreateTokenSummaryRawTransaction(wrapper open
 	for _, addrBalance := range addrBalanceArray {
 
 		trxBalance := big.NewInt(0)
+		trxBalanceDec := decimal.Zero
 
 		//检查余额是否超过最低转账
 		addrBalance_BI := common.StringNumToBigIntWithExp(addrBalance.Balance.Balance, tokenDecimals)
@@ -631,6 +668,58 @@ func (decoder *TransactionDecoder) CreateTokenSummaryRawTransaction(wrapper open
 		}
 		if len(addrTRXBalanceArray) > 0 {
 			trxBalance = common.StringNumToBigIntWithExp(addrTRXBalanceArray[0].Balance, decoder.wm.Decimal())
+			trxBalanceDec, _ = decimal.NewFromString(addrTRXBalanceArray[0].Balance)
+		}
+
+		//有手续费账户支持
+		if feesSupportAccount != nil {
+
+			//通过手续费账户创建交易单
+			supportAddress := addrBalance.Balance.Address
+			supportAmount := decimal.Zero
+			//feesSupportScale, _ := decimal.NewFromString(sumRawTx.FeesSupportAccount.FeesSupportScale)
+			fixSupportAmount, _ := decimal.NewFromString(sumRawTx.FeesSupportAccount.FixSupportAmount)
+
+			//目前TRON的手续费计算，官方没有API方法，只能采用固定数量支持
+			supportAmount = fixSupportAmount
+			half := decimal.New(2, 0)
+
+			//如果余额低于固定数量/2，就需要手续费转账支持
+			if trxBalanceDec.LessThan(supportAmount.Div(half)) {
+
+				decoder.wm.Log.Debugf("create transaction for fees support account")
+				decoder.wm.Log.Debugf("fees account: %s", feesSupportAccount.AccountID)
+				//decoder.wm.Log.Debugf("mini support amount: %s", fees.String())
+				decoder.wm.Log.Debugf("allow support amount: %s", supportAmount.String())
+				decoder.wm.Log.Debugf("support address: %s", supportAddress)
+
+				supportCoin := openwallet.Coin{
+					Symbol:     sumRawTx.Coin.Symbol,
+					IsContract: false,
+				}
+
+				//创建一笔交易单
+				rawTx := &openwallet.RawTransaction{
+					Coin:    supportCoin,
+					Account: feesSupportAccount,
+					To: map[string]string{
+						addrBalance.Balance.Address: supportAmount.String(),
+					},
+					Required: 1,
+				}
+
+				createTxErr := decoder.CreateRawTransaction(wrapper, rawTx)
+				rawTxWithErr := &openwallet.RawTransactionWithError{
+					RawTx: rawTx,
+					Error: openwallet.ConvertError(createTxErr),
+				}
+
+				//创建成功，添加到队列
+				rawTxArray = append(rawTxArray, rawTxWithErr)
+
+				//汇总下一个
+				continue
+			}
 		}
 
 		decoder.wm.Log.Debugf("balance: %v", addrBalance.Balance.Balance)
@@ -648,7 +737,7 @@ func (decoder *TransactionDecoder) CreateTokenSummaryRawTransaction(wrapper open
 			RawHex:   rawHex,
 		}
 
-		createErr = decoder.createRawTransaction(
+		createTxErr := decoder.createRawTransaction(
 			wrapper,
 			rawTx,
 			&AddrBalance{
@@ -660,9 +749,13 @@ func (decoder *TransactionDecoder) CreateTokenSummaryRawTransaction(wrapper open
 		if createErr != nil {
 			return nil, createErr
 		}
+		rawTxWithErr := &openwallet.RawTransactionWithError{
+			RawTx: rawTx,
+			Error: createTxErr,
+		}
 
 		//创建成功，添加到队列
-		rawTxArray = append(rawTxArray, rawTx)
+		rawTxArray = append(rawTxArray, rawTxWithErr)
 
 	}
 
@@ -675,7 +768,7 @@ func (decoder *TransactionDecoder) createRawTransaction(
 	rawTx *openwallet.RawTransaction,
 	addrBalance *AddrBalance,
 	feeInfo *txFeeInfo,
-	callData string) error {
+	callData string) *openwallet.Error {
 
 	var (
 		accountTotalSent = decimal.Zero
@@ -717,7 +810,7 @@ func (decoder *TransactionDecoder) createRawTransaction(
 
 	addr, err := wrapper.GetAddress(addrBalance.Address)
 	if err != nil {
-		return err
+		return openwallet.ConvertError(err)
 	}
 
 	rawHex = rawTx.RawHex
@@ -725,7 +818,7 @@ func (decoder *TransactionDecoder) createRawTransaction(
 	txHashBytes, err := getTxHash1(rawHex)
 	if err != nil {
 		decoder.wm.Log.Info("get Tx hash failed;unexpected error:%v", err)
-		return err
+		return openwallet.ConvertError(err)
 	}
 	txHash := hex.EncodeToString(txHashBytes)
 
