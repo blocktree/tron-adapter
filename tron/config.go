@@ -105,8 +105,10 @@ type WalletConfig struct {
 	CoinDecimal decimal.Decimal
 	//后台数据源类型
 	RPCServerType int
-	//FeeLimit
+	//FeeLimit 智能合约最大能量消耗限制，1 Energy = 10 SUN
 	FeeLimit int64
+	//FeeMini 智能合约最小能量消耗起，1 Energy = 10 SUN
+	FeeMini int64
 }
 
 //NewConfig Create config instance

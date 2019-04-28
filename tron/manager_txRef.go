@@ -704,3 +704,24 @@ func (wm *WalletManager) GetTransactionFeeEstimated(from string, data string) (*
 	*/
 	return feeInfo, nil
 }
+
+
+//IsEnoughEnergyToTransferTRC20 是否足够能量转账TRC20
+func (wm *WalletManager) IsEnoughEnergyToTransferTRC20(address string, trxBalance *big.Int) (flag bool, energyRest int64, feeMini int64) {
+	feeMini = wm.Config.FeeMini
+	res, err := wm.GetAccountResource(address)
+	if err != nil {
+		return false, 0, feeMini
+	}
+
+	energyRest = res.EnergyLimit - res.EnergyUsed
+	//1 Energy = 10 SUN
+	trxEnergy := trxBalance.Div(trxBalance, big.NewInt(10)).Int64()
+	energyRest = energyRest + trxEnergy
+	//能量少于下限
+	if energyRest < feeMini {
+		return false, energyRest, feeMini
+	}
+
+	return true, energyRest, feeMini
+}

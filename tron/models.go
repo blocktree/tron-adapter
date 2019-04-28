@@ -407,6 +407,30 @@ func NewAccountNet(json *gjson.Result) *AccountNet {
 	return obj
 }
 
+type AccountResource struct {
+	FreeNetUsed  int64
+	FreeNetLimit int64
+	NetUsed      int64
+	NetLimit     int64
+	EnergyUsed   int64
+	EnergyLimit  int64
+	StorageUsed  int64
+	StorageLimit int64
+}
+
+func NewAccountResource(json *gjson.Result) *AccountResource {
+	obj := &AccountResource{}
+	obj.FreeNetUsed = json.Get("freeNetUsed").Int()
+	obj.FreeNetLimit = json.Get("freeNetLimit").Int()
+	obj.NetUsed = json.Get("NetUsed").Int()
+	obj.NetLimit = json.Get("NetLimit").Int()
+	obj.EnergyUsed = json.Get("EnergyUsed").Int()
+	obj.EnergyLimit = json.Get("EnergyLimit").Int()
+	obj.StorageUsed = json.Get("StorageUsed").Int()
+	obj.StorageLimit = json.Get("StorageLimit").Int()
+	return obj
+}
+
 type txFeeInfo struct {
 	GasUsed  int64
 	GasPrice decimal.Decimal

@@ -126,7 +126,7 @@ func TestTransfer_TRX(t *testing.T) {
 
 	testGetAssetsAccountBalance(tm, walletID, accountID)
 
-	rawTx, err := testCreateTransactionStep(tm, walletID, accountID, to, "0.001", "", nil)
+	rawTx, err := testCreateTransactionStep(tm, walletID, accountID, to, "0.3", "", nil)
 	if err != nil {
 		return
 	}
@@ -244,7 +244,7 @@ func TestSummary(t *testing.T) {
 	testGetAssetsAccountBalance(tm, walletID, accountID)
 
 	rawTxArray, err := testCreateSummaryTransactionStep(tm, walletID, accountID,
-		summaryAddress, "", "", "",
+		summaryAddress, "0.01", "0.01", "",
 		0, 100, nil, nil)
 	if err != nil {
 		log.Errorf("CreateSummaryTransaction failed, unexpected error: %v", err)
@@ -345,8 +345,8 @@ func TestSummary_TRC20(t *testing.T) {
 
 	feesSupport := openwallet.FeesSupportAccount{
 		AccountID: "5Tm3sqFap329wj3Du4DVXMkjAe85FVH3MaB6HSV8joj1",
-		FixSupportAmount: "1",
-		//FeesSupportScale: "1.3",
+		//FixSupportAmount: "1",
+		FeesSupportScale: "1.3",
 	}
 
 	contract := openwallet.SmartContract{

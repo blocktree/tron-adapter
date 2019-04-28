@@ -7,7 +7,7 @@ require (
 	github.com/astaxie/beego v1.11.1
 	github.com/blocktree/go-owcdrivers v1.0.4
 	github.com/blocktree/go-owcrypt v1.0.1
-	github.com/blocktree/openwallet v1.2.1
+	github.com/blocktree/openwallet v1.4.1
 	github.com/bndr/gotabulate v1.1.2
 	github.com/btcsuite/btcutil v0.0.0-20190316010144-3ac1210f4b38
 	github.com/golang/protobuf v1.3.1
@@ -20,4 +20,4 @@ require (
 	google.golang.org/grpc v1.19.1
 )
 
-replace github.com/blocktree/openwallet => ../../openwallet
+//replace github.com/blocktree/openwallet => ../../openwallet

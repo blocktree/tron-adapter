@@ -58,6 +58,21 @@ func (wm *WalletManager) GetAccountNet(address string) (accountNet *AccountNet, 
 	return accountNet, nil
 }
 
+// GetAccountResource
+func (wm *WalletManager) GetAccountResource(address string) (*AccountResource, error) {
+
+	address = convertAddrToHex(address)
+
+	params := req.Param{"address": address}
+	r, err := wm.WalletClient.Call("/wallet/getaccountresource", params)
+	if err != nil {
+		return nil, err
+	}
+	res := NewAccountResource(r)
+	return res, nil
+}
+
+
 //deprecated
 // GetAccount Done!
 // Function：Query bandwidth information.

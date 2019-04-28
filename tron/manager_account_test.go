@@ -23,13 +23,25 @@ import (
 func TestGetAccountNet(t *testing.T) {
 
 	var addr string
-	addr = "TFHtQPM6SJ2GTebArYkhvZKk4rc3WAmdgE"
+	addr = "TRJJ9Mq4aMjdmKWpTDJAgbYNoY2P9Facg5"
 	accountNet, err := tw.GetAccountNet(addr)
 	if err != nil {
 		t.Errorf("GetAccountNet failed: %v\n", err)
 		return
 	}
 	log.Infof("accountNet: %+v", accountNet)
+}
+
+func TestGetAccountResource(t *testing.T) {
+
+	var addr string
+	addr = "TRJJ9Mq4aMjdmKWpTDJAgbYNoY2P9Facg5"
+	account, err := tw.GetAccountResource(addr)
+	if err != nil {
+		t.Errorf("GetAccountResource failed: %v\n", err)
+		return
+	}
+	log.Infof("GetAccountResource: %+v", account)
 }
 
 func TestGetAccount(t *testing.T) {
