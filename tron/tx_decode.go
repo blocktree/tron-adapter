@@ -782,9 +782,6 @@ func (decoder *TransactionDecoder) CreateTokenSummaryRawTransaction(wrapper open
 				TronBalance:  trxBalance},
 			fee,
 			"")
-		if createErr != nil {
-			return nil, createErr
-		}
 		rawTxWithErr := &openwallet.RawTransactionWithError{
 			RawTx: rawTx,
 			Error: createTxErr,
