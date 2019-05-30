@@ -505,7 +505,7 @@ func (bs *TronBlockScanner) extractTxInput(tx *Contract, txExtractData *openwall
 
 	//主网from交易转账信息，第一个TxInput
 	txInput := &openwallet.TxInput{}
-	txInput.Recharge.Sid = openwallet.GenTxInputSID(tx.TxID, bs.wm.Symbol(), "", uint64(0))
+	txInput.Recharge.Sid = openwallet.GenTxInputSID(tx.TxID, bs.wm.Symbol(), coin.ContractID, uint64(0))
 	txInput.Recharge.TxID = tx.TxID
 	txInput.Recharge.Address = tx.From
 	txInput.Recharge.Coin = coin
@@ -543,7 +543,7 @@ func (bs *TronBlockScanner) extractTxOutput(tx *Contract, txExtractData *openwal
 
 	//主网to交易转账信息,只有一个TxOutPut
 	txOutput := &openwallet.TxOutPut{}
-	txOutput.Recharge.Sid = openwallet.GenTxOutPutSID(tx.TxID, bs.wm.Symbol(), "", uint64(0))
+	txOutput.Recharge.Sid = openwallet.GenTxOutPutSID(tx.TxID, bs.wm.Symbol(), coin.ContractID, uint64(0))
 	txOutput.Recharge.TxID = tx.TxID
 	txOutput.Recharge.Address = tx.To
 	txOutput.Recharge.Coin = coin

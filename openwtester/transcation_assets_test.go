@@ -157,11 +157,20 @@ func TestTransfer_TRC20(t *testing.T) {
 	accountID := "4pF3jRC2XokaaLZWiiLvxXrD8SKRYNuzcVCFkJdu6rkt"
 	to := "TRJJ9Mq4aMjdmKWpTDJAgbYNoY2P9Facg5"
 
+	//contract := openwallet.SmartContract{
+	//	Address:  "THvZvKPLHKLJhEFYKiyqj6j8G8nGgfg7ur",
+	//	Symbol:   "TRX",
+	//	Name:     "TRONdice",
+	//	Token:    "DICE",
+	//	Decimals: 6,
+	//	Protocol: "trc20",
+	//}
+
 	contract := openwallet.SmartContract{
-		Address:  "THvZvKPLHKLJhEFYKiyqj6j8G8nGgfg7ur",
+		Address:  "TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t",
 		Symbol:   "TRX",
-		Name:     "TRONdice",
-		Token:    "DICE",
+		Name:     "Tether USD",
+		Token:    "USDT",
 		Decimals: 6,
 		Protocol: "trc20",
 	}
@@ -170,7 +179,7 @@ func TestTransfer_TRC20(t *testing.T) {
 
 	testGetAssetsAccountTokenBalance(tm, walletID, accountID, contract)
 
-	rawTx, err := testCreateTransactionStep(tm, walletID, accountID, to, "0.002", "", &contract)
+	rawTx, err := testCreateTransactionStep(tm, walletID, accountID, to, "1.5", "", &contract)
 	if err != nil {
 		return
 	}
@@ -244,7 +253,7 @@ func TestSummary(t *testing.T) {
 	testGetAssetsAccountBalance(tm, walletID, accountID)
 
 	rawTxArray, err := testCreateSummaryTransactionStep(tm, walletID, accountID,
-		summaryAddress, "0.01", "0.01", "",
+		summaryAddress, "", "", "",
 		0, 100, nil, nil)
 	if err != nil {
 		log.Errorf("CreateSummaryTransaction failed, unexpected error: %v", err)
@@ -345,15 +354,24 @@ func TestSummary_TRC20(t *testing.T) {
 
 	feesSupport := openwallet.FeesSupportAccount{
 		AccountID: "5Tm3sqFap329wj3Du4DVXMkjAe85FVH3MaB6HSV8joj1",
-		//FixSupportAmount: "1",
-		FeesSupportScale: "1.3",
+		FixSupportAmount: "0.5",
+		//FeesSupportScale: "1.3",
 	}
 
+	//contract := openwallet.SmartContract{
+	//	Address:  "THvZvKPLHKLJhEFYKiyqj6j8G8nGgfg7ur",
+	//	Symbol:   "TRX",
+	//	Name:     "TRONdice",
+	//	Token:    "DICE",
+	//	Decimals: 6,
+	//	Protocol: "trc20",
+	//}
+
 	contract := openwallet.SmartContract{
-		Address:  "THvZvKPLHKLJhEFYKiyqj6j8G8nGgfg7ur",
+		Address:  "TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t",
 		Symbol:   "TRX",
-		Name:     "TRONdice",
-		Token:    "DICE",
+		Name:     "Tether USD",
+		Token:    "USDT",
 		Decimals: 6,
 		Protocol: "trc20",
 	}

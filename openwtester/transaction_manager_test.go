@@ -106,7 +106,7 @@ func TestWalletManager_GetTransactionByWxID(t *testing.T) {
 func TestWalletManager_GetAssetsAccountBalance(t *testing.T) {
 	tm := testInitWalletManager()
 	walletID := "WGVsUfTTVaCwAMRTqeJiDQsZ3vrWp9DzMA"
-	accountID := "CbnmpvJNsUjtEMRoy5Nf5FGTyfjLbke8FuKjKtEUc7fs"
+	accountID := "4pF3jRC2XokaaLZWiiLvxXrD8SKRYNuzcVCFkJdu6rkt"
 
 	balance, err := tm.GetAssetsAccountBalance(testApp, walletID, accountID)
 	if err != nil {
@@ -121,13 +121,31 @@ func TestWalletManager_GetAssetsAccountTokenBalance(t *testing.T) {
 	walletID := "WGVsUfTTVaCwAMRTqeJiDQsZ3vrWp9DzMA"
 	accountID := "4pF3jRC2XokaaLZWiiLvxXrD8SKRYNuzcVCFkJdu6rkt"
 
+	//contract := openwallet.SmartContract{
+	//	Address:  "TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t",
+	//	Symbol:   "TRX",
+	//	Name:     "Tether USD",
+	//	Token:    "USDT",
+	//	Decimals: 6,
+	//	Protocol: "trc20",
+	//}
+
+	//contract := openwallet.SmartContract{
+	//	Address:  "THvZvKPLHKLJhEFYKiyqj6j8G8nGgfg7ur",
+	//	Symbol:   "TRX",
+	//	Name:     "TRONdice",
+	//	Token:    "DICE",
+	//	Decimals: 6,
+	//	Protocol: "trc20",
+	//}
+
 	contract := openwallet.SmartContract{
-		Address:  "THvZvKPLHKLJhEFYKiyqj6j8G8nGgfg7ur",
+		Address:  "1002000",
 		Symbol:   "TRX",
-		Name:     "TRONdice",
-		Token:    "DICE",
-		Decimals: 6,
-		Protocol: "trc20",
+		Name:     "BitTorrent",
+		Token:    "BTT",
+		Decimals: 0,
+		Protocol: "trc10",
 	}
 
 	balance, err := tm.GetAssetsAccountTokenBalance(testApp, walletID, accountID, contract)

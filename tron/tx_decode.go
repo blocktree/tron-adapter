@@ -591,12 +591,14 @@ func (decoder *TransactionDecoder) CreateSimpleSummaryRawTransaction(wrapper ope
 func (decoder *TransactionDecoder) CreateTokenSummaryRawTransaction(wrapper openwallet.WalletDAI, sumRawTx *openwallet.SummaryRawTransaction) ([]*openwallet.RawTransactionWithError, error) {
 
 	var (
-		rawTxArray         = make([]*openwallet.RawTransactionWithError, 0)
-		accountID          = sumRawTx.Account.AccountID
-		minTransfer        = common.StringNumToBigIntWithExp(sumRawTx.MinTransfer, Decimals)
-		retainedBalance    = common.StringNumToBigIntWithExp(sumRawTx.RetainedBalance, Decimals)
+		rawTxArray = make([]*openwallet.RawTransactionWithError, 0)
+		accountID  = sumRawTx.Account.AccountID
 		feesSupportAccount *openwallet.AssetsAccount
 	)
+
+	tokenDecimals := int32(sumRawTx.Coin.Contract.Decimals)
+	minTransfer := common.StringNumToBigIntWithExp(sumRawTx.MinTransfer, tokenDecimals)
+	retainedBalance := common.StringNumToBigIntWithExp(sumRawTx.RetainedBalance, tokenDecimals)
 
 	// 如果有提供手续费账户，检查账户是否存在
 	if feesAcount := sumRawTx.FeesSupportAccount; feesAcount != nil {
@@ -608,7 +610,6 @@ func (decoder *TransactionDecoder) CreateTokenSummaryRawTransaction(wrapper open
 		feesSupportAccount = account
 	}
 
-	tokenDecimals := int32(sumRawTx.Coin.Contract.Decimals)
 	tokenProtocol := sumRawTx.Coin.Contract.Protocol
 
 	if minTransfer.Cmp(retainedBalance) < 0 {
