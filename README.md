@@ -14,5 +14,7 @@ ServerAPI = "http://127.0.0.1:18090"
 isTestNet = false
 # feeLimit, the maximum energy is 1000000000
 feeLimit = 10000000
+# Cache data file directory, default = "", current directory: ./data
+dataDir = ""
 
 ```

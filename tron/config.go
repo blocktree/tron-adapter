@@ -109,6 +109,8 @@ type WalletConfig struct {
 	FeeLimit int64
 	//FeeMini 智能合约最小能量消耗起，1 Energy = 10 SUN
 	FeeMini int64
+	//数据目录
+	DataDir string
 }
 
 //NewConfig Create config instance
@@ -197,9 +199,9 @@ feeLimit = 10000000
 `
 
 	//创建目录
-	file.MkdirAll(c.dbPath)
-	file.MkdirAll(c.backupDir)
-	file.MkdirAll(c.keyDir)
+	//file.MkdirAll(c.dbPath)
+	//file.MkdirAll(c.backupDir)
+	//file.MkdirAll(c.keyDir)
 
 	return &c
 }
@@ -247,4 +249,19 @@ func (wc *WalletConfig) InitConfig() {
 		file.WriteFile(absFile, []byte(wc.DefaultConfig), false)
 	}
 
+}
+
+//创建文件夹
+func (wc *WalletConfig) makeDataDir() {
+
+	if len(wc.DataDir) == 0 {
+		//默认路径当前文件夹./data
+		wc.DataDir = "data"
+	}
+
+	//本地数据库文件路径
+	wc.dbPath = filepath.Join(wc.DataDir, strings.ToLower(wc.Symbol), "db")
+
+	//创建目录
+	file.MkdirAll(wc.dbPath)
 }
