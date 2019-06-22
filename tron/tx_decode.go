@@ -100,7 +100,7 @@ func (decoder *TransactionDecoder) CreateSimpleTransaction(wrapper openwallet.Wa
 	}
 
 	if len(addresses) == 0 {
-		return fmt.Errorf("[%s] have not addresses", accountID)
+		return openwallet.Errorf(openwallet.ErrAccountNotAddress,"[%s] have not addresses", accountID)
 	}
 
 	searchAddrs := make([]string, 0)
@@ -163,7 +163,7 @@ func (decoder *TransactionDecoder) CreateSimpleTransaction(wrapper openwallet.Wa
 	}
 
 	if findAddrBalance == nil {
-		return fmt.Errorf("the balance: %s is not enough", amountStr)
+		return openwallet.Errorf(openwallet.ErrInsufficientBalanceOfAccount, "the balance: %s is not enough", amountStr)
 	}
 
 	//最后创建交易单
@@ -231,6 +231,10 @@ func (decoder *TransactionDecoder) CreateTokenTransaction(wrapper openwallet.Wal
 		}
 	})
 
+	tokenBalanceNotEnough := false
+	balanceNotEnough := false
+	errStr := ""
+
 	amountDec, _ := decimal.NewFromString(amountStr)
 
 	for _, addrBalance := range addrBalanceArray {
@@ -265,6 +269,7 @@ func (decoder *TransactionDecoder) CreateTokenTransaction(wrapper openwallet.Wal
 
 		//总消耗数量 = 转账数量 + 手续费
 		if addrBalance_dec.LessThan(amountDec.Add(feeInfo.Fee)) {
+			tokenBalanceNotEnough = true
 			continue
 		}
 
@@ -273,7 +278,10 @@ func (decoder *TransactionDecoder) CreateTokenTransaction(wrapper openwallet.Wal
 			//判断账户资源是否足够
 			isEnoughEnegry, energyRest, feeMini := decoder.wm.IsEnoughEnergyToTransferTRC20(addrBalance.Balance.Address, trxBalance)
 			if !isEnoughEnegry {
-				return openwallet.Errorf(openwallet.ErrInsufficientFees, "address[%s] available energy: %d is less than feeMini: %d", addrBalance.Balance.Address, energyRest, feeMini)
+				balanceNotEnough = true
+				errStr = fmt.Sprintf("address[%s] available energy: %d is less than feeMini: %d", addrBalance.Balance.Address, energyRest, feeMini)
+				continue
+
 			}
 		}
 
@@ -287,7 +295,12 @@ func (decoder *TransactionDecoder) CreateTokenTransaction(wrapper openwallet.Wal
 	}
 
 	if findAddrBalance == nil {
-		return fmt.Errorf("the balance: %s is not enough", amountStr)
+		if tokenBalanceNotEnough {
+			return openwallet.Errorf(openwallet.ErrInsufficientTokenBalanceOfAddress,"the balance: %s is not enough", amountStr)
+		}
+		if balanceNotEnough {
+			return openwallet.Errorf(openwallet.ErrInsufficientFees, errStr)
+		}
 	}
 
 	//最后创建交易单

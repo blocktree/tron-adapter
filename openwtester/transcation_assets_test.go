@@ -126,7 +126,7 @@ func TestTransfer_TRX(t *testing.T) {
 
 	testGetAssetsAccountBalance(tm, walletID, accountID)
 
-	rawTx, err := testCreateTransactionStep(tm, walletID, accountID, to, "0.3", "", nil)
+	rawTx, err := testCreateTransactionStep(tm, walletID, accountID, to, "0.03", "", nil)
 	if err != nil {
 		return
 	}
@@ -157,29 +157,29 @@ func TestTransfer_TRC20(t *testing.T) {
 	accountID := "4pF3jRC2XokaaLZWiiLvxXrD8SKRYNuzcVCFkJdu6rkt"
 	to := "TRJJ9Mq4aMjdmKWpTDJAgbYNoY2P9Facg5"
 
-	//contract := openwallet.SmartContract{
-	//	Address:  "THvZvKPLHKLJhEFYKiyqj6j8G8nGgfg7ur",
-	//	Symbol:   "TRX",
-	//	Name:     "TRONdice",
-	//	Token:    "DICE",
-	//	Decimals: 6,
-	//	Protocol: "trc20",
-	//}
-
 	contract := openwallet.SmartContract{
-		Address:  "TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t",
+		Address:  "THvZvKPLHKLJhEFYKiyqj6j8G8nGgfg7ur",
 		Symbol:   "TRX",
-		Name:     "Tether USD",
-		Token:    "USDT",
+		Name:     "TRONdice",
+		Token:    "DICE",
 		Decimals: 6,
 		Protocol: "trc20",
 	}
+
+	//contract := openwallet.SmartContract{
+	//	Address:  "TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t",
+	//	Symbol:   "TRX",
+	//	Name:     "Tether USD",
+	//	Token:    "USDT",
+	//	Decimals: 6,
+	//	Protocol: "trc20",
+	//}
 
 	testGetAssetsAccountBalance(tm, walletID, accountID)
 
 	testGetAssetsAccountTokenBalance(tm, walletID, accountID, contract)
 
-	rawTx, err := testCreateTransactionStep(tm, walletID, accountID, to, "1.5", "", &contract)
+	rawTx, err := testCreateTransactionStep(tm, walletID, accountID, to, "9.5", "", &contract)
 	if err != nil {
 		return
 	}
