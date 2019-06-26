@@ -32,8 +32,6 @@ func init() {
 	tw = NewWalletManager()
 
 	//tw.Config.ServerAPI = "http://127.0.0.1:28090"
-	// tw.Config.ServerAPI = "http://127.0.0.1:18090"
-	//tw.Config.ServerAPI = "http://192.168.2.194:18090"
 	tw.Config.ServerAPI = "https://api.trongrid.io"
 	tw.Config.IsTestNet = false
 	// tw.Config.RpcUser = "walletUser"

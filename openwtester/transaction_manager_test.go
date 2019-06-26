@@ -130,23 +130,23 @@ func TestWalletManager_GetAssetsAccountTokenBalance(t *testing.T) {
 	//	Protocol: "trc20",
 	//}
 
-	//contract := openwallet.SmartContract{
-	//	Address:  "THvZvKPLHKLJhEFYKiyqj6j8G8nGgfg7ur",
-	//	Symbol:   "TRX",
-	//	Name:     "TRONdice",
-	//	Token:    "DICE",
-	//	Decimals: 6,
-	//	Protocol: "trc20",
-	//}
-
 	contract := openwallet.SmartContract{
-		Address:  "1002000",
+		Address:  "THvZvKPLHKLJhEFYKiyqj6j8G8nGgfg7ur",
 		Symbol:   "TRX",
-		Name:     "BitTorrent",
-		Token:    "BTT",
-		Decimals: 0,
-		Protocol: "trc10",
+		Name:     "TRONdice",
+		Token:    "DICE",
+		Decimals: 6,
+		Protocol: "trc20",
 	}
+
+	//contract := openwallet.SmartContract{
+	//	Address:  "1002000",
+	//	Symbol:   "TRX",
+	//	Name:     "BitTorrent",
+	//	Token:    "BTT",
+	//	Decimals: 0,
+	//	Protocol: "trc10",
+	//}
 
 	balance, err := tm.GetAssetsAccountTokenBalance(testApp, walletID, accountID, contract)
 	if err != nil {

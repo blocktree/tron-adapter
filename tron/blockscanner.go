@@ -424,10 +424,16 @@ func (bs *TronBlockScanner) InitTronExtractResult(tx *Contract, result *ExtractR
 
 	status := "1"
 	reason := ""
-	if tx.ContractRet != SUCCESS {
-		status = "0"
-		reason = tx.ContractRet
+
+	//TRC20转账才需要判断ContractRet状态
+	if tx.Type == TriggerSmartContract {
+		if tx.ContractRet != SUCCESS {
+			status = "0"
+			reason = tx.ContractRet
+		}
 	}
+
+
 	amount := decimal.Zero
 	coin := openwallet.Coin{
 		Symbol:     bs.wm.Symbol(),

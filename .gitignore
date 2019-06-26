@@ -3,3 +3,4 @@ release
 .vscode
 .idea
 *.key
+openwtester/conf
