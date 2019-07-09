@@ -48,6 +48,7 @@ const (
 	SUN int64 = 1	//最小单位
 	TRX int64 = SUN * 1000000  //1 TRX = 1000000 * sun
 	GasPrice = SUN * 10
+	CreateAccountCost = SUN * 100000 //0.1 TRX = 100000 * sun
 )
 
 //WalletConfig configs for Wallet

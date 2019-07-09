@@ -85,7 +85,7 @@ func (c *Client) Call(path string, param interface{}) (*gjson.Result, error) {
 
 //getBalance 获取地址余额
 func (wm *WalletManager) getBalance(address string) (*openwallet.Balance, error) {
-	account, err := wm.GetTRXAccount(address)
+	account, _, err := wm.GetTRXAccount(address)
 	if err != nil {
 		return nil, err
 	}

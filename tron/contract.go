@@ -197,7 +197,7 @@ func (wm *WalletManager) GetTRC20Balance(address string, contractAddress string)
 //GetTokenBalance 获取代币余额
 func (wm *WalletManager) GetTRC10Balance(address string, tokenID string) (int64, error) {
 
-	a, err := wm.GetTRXAccount(address)
+	a, _, err := wm.GetTRXAccount(address)
 	if err != nil {
 		return 0, err
 	}

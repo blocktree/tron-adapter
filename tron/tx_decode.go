@@ -133,7 +133,15 @@ func (decoder *TransactionDecoder) CreateSimpleTransaction(wrapper openwallet.Wa
 
 	amountDec, _ := decimal.NewFromString(amountStr)
 
+	//检查目标地址是否存在
+	_, exist, err := decoder.wm.GetTRXAccount(to)
+	if err != nil {
+		return err
+	}
+
 	for _, addrBalance := range addrBalanceArray {
+
+		totalCost := amountDec
 
 		addrBalance_dec, _ := decimal.NewFromString(addrBalance.Balance)
 
@@ -152,8 +160,17 @@ func (decoder *TransactionDecoder) CreateSimpleTransaction(wrapper openwallet.Wa
 			continue
 		}
 
+		totalCost = totalCost.Add(feeInfo.Fee)
+
+		//目标地址不存在，总消耗要加0.1
+		if !exist {
+			newAccountCost := decimal.New(CreateAccountCost, 0)
+			newAccountCost = newAccountCost.Shift(-decoder.wm.Decimal())
+			totalCost = totalCost.Add(newAccountCost)
+		}
+
 		//总消耗数量 = 转账数量 + 手续费
-		if addrBalance_dec.LessThan(amountDec.Add(feeInfo.Fee)) {
+		if addrBalance_dec.LessThan(totalCost) {
 			continue
 		}
 
@@ -163,7 +180,12 @@ func (decoder *TransactionDecoder) CreateSimpleTransaction(wrapper openwallet.Wa
 	}
 
 	if findAddrBalance == nil {
-		return openwallet.Errorf(openwallet.ErrInsufficientBalanceOfAccount, "the balance: %s is not enough", amountStr)
+		if exist {
+			return openwallet.Errorf(openwallet.ErrInsufficientBalanceOfAccount, "the balance is not enough")
+		} else {
+			return openwallet.Errorf(openwallet.ErrInsufficientBalanceOfAccount, "the balance is not enough, [%s] is not exist should cost 0.1 %s to create", to, decoder.wm.Symbol())
+		}
+
 	}
 
 	//最后创建交易单
@@ -237,6 +259,12 @@ func (decoder *TransactionDecoder) CreateTokenTransaction(wrapper openwallet.Wal
 
 	amountDec, _ := decimal.NewFromString(amountStr)
 
+	//检查目标地址是否存在
+	_, exist, err := decoder.wm.GetTRXAccount(to)
+	if err != nil {
+		return err
+	}
+
 	for _, addrBalance := range addrBalanceArray {
 
 		trxBalance := big.NewInt(0)
@@ -268,9 +296,15 @@ func (decoder *TransactionDecoder) CreateTokenTransaction(wrapper openwallet.Wal
 		}
 
 		//总消耗数量 = 转账数量 + 手续费
-		if addrBalance_dec.LessThan(amountDec.Add(feeInfo.Fee)) {
+		if addrBalance_dec.LessThan(amountDec) {
 			tokenBalanceNotEnough = true
 			continue
+		}
+
+		//目标地址不存在，总消耗要加0.1
+		if !exist {
+			newAccountCost := big.NewInt(CreateAccountCost)
+			trxBalance.Sub(trxBalance, newAccountCost)
 		}
 
 		//TRC20，需要检查能量是否足够调用合约
@@ -282,6 +316,12 @@ func (decoder *TransactionDecoder) CreateTokenTransaction(wrapper openwallet.Wal
 				errStr = fmt.Sprintf("address[%s] available energy: %d is less than feeMini: %d", addrBalance.Balance.Address, energyRest, feeMini)
 				continue
 
+			}
+		} else {
+			if trxBalance.Cmp(big.NewInt(0)) < 0 {
+				balanceNotEnough = true
+				errStr = fmt.Sprintf("the %s balance is not enough, [%s] is not exist should cost 0.1 %s to create", decoder.wm.Symbol(), to, decoder.wm.Symbol())
+				continue
 			}
 		}
 
@@ -532,6 +572,12 @@ func (decoder *TransactionDecoder) CreateSimpleSummaryRawTransaction(wrapper ope
 		return nil, err
 	}
 
+	//检查目标地址是否存在
+	_, exist, err := decoder.wm.GetTRXAccount(sumRawTx.SummaryAddress)
+	if err != nil {
+		return nil, err
+	}
+
 	for _, addrBalance := range addrBalanceArray {
 
 		//检查余额是否超过最低转账
@@ -543,6 +589,13 @@ func (decoder *TransactionDecoder) CreateSimpleSummaryRawTransaction(wrapper ope
 		//计算汇总数量 = 余额 - 保留余额
 		sumAmount_BI := new(big.Int)
 		sumAmount_BI.Sub(addrBalance_BI, retainedBalance)
+
+		//目标地址不存在，总消耗要加0.1
+		if !exist {
+			newAccountCost := big.NewInt(CreateAccountCost)
+			sumAmount_BI.Sub(sumAmount_BI, newAccountCost)
+		}
+
 		sumAmount := common.BigIntToDecimals(sumAmount_BI, Decimals)
 
 		//创建空交易单
@@ -645,6 +698,12 @@ func (decoder *TransactionDecoder) CreateTokenSummaryRawTransaction(wrapper open
 		searchAddrs = append(searchAddrs, address.Address)
 	}
 
+	//检查目标地址是否存在
+	_, exist, err := decoder.wm.GetTRXAccount(sumRawTx.SummaryAddress)
+	if err != nil {
+		return nil, err
+	}
+
 	addrBalanceArray, err := decoder.wm.ContractDecoder.GetTokenBalanceByAddress(sumRawTx.Coin.Contract, searchAddrs...)
 	if err != nil {
 		return nil, err
@@ -695,6 +754,13 @@ func (decoder *TransactionDecoder) CreateTokenSummaryRawTransaction(wrapper open
 			trxBalance = common.StringNumToBigIntWithExp(addrTRXBalanceArray[0].Balance, decoder.wm.Decimal())
 		}
 
+		//目标地址不存在，总消耗要加0.1
+		if !exist {
+			newAccountCost := big.NewInt(CreateAccountCost)
+			trxBalance.Sub(trxBalance, newAccountCost)
+		}
+		makeFeesSupport := false
+		supportAddress := ""
 		//TRC20，需要检查能量是否足够调用合约
 		if strings.EqualFold(tokenProtocol, TRC20) {
 			//判断账户资源是否足够
@@ -712,64 +778,80 @@ func (decoder *TransactionDecoder) CreateTokenSummaryRawTransaction(wrapper open
 					continue
 				}
 
+				makeFeesSupport = true
+				supportAddress = addrBalance.Balance.Address
+
 				decoder.wm.Log.Debugf("use fees support account: %s to recharge energy", feesSupportAccount.AccountID)
-
-				//通过手续费账户创建交易单
-				supportAddress := addrBalance.Balance.Address
-				supportAmount := decimal.Zero
-				feesSupportScale, _ := decimal.NewFromString(sumRawTx.FeesSupportAccount.FeesSupportScale)
-				fixSupportAmount, _ := decimal.NewFromString(sumRawTx.FeesSupportAccount.FixSupportAmount)
-				//1 Energy = 10 SUN, 1 trx = 1000000 SUN, fees(trx) = Energy * 100000
-				fees := decimal.New(feeMini, 1-decoder.wm.Decimal())
-
-				//优先采用固定支持数量
-				if fixSupportAmount.GreaterThan(decimal.Zero) {
-					supportAmount = fixSupportAmount
-				} else {
-					//没有固定支持数量，有手续费倍率，计算支持数量
-					if feesSupportScale.GreaterThan(decimal.Zero) {
-						supportAmount = feesSupportScale.Mul(fees)
-					} else {
-						//默认支持数量为手续费
-						supportAmount = fees
-					}
-				}
-
-				decoder.wm.Log.Debugf("create transaction for fees support account")
-				decoder.wm.Log.Debugf("fees account: %s", feesSupportAccount.AccountID)
-				decoder.wm.Log.Debugf("mini support amount: %s", fees.String())
-				decoder.wm.Log.Debugf("allow support amount: %s", supportAmount.String())
-				decoder.wm.Log.Debugf("support address: %s", supportAddress)
-
-				supportCoin := openwallet.Coin{
-					Symbol:     sumRawTx.Coin.Symbol,
-					IsContract: false,
-				}
-
-				//创建一笔交易单
-				rawTx := &openwallet.RawTransaction{
-					Coin:    supportCoin,
-					Account: feesSupportAccount,
-					To: map[string]string{
-						addrBalance.Balance.Address: supportAmount.String(),
-					},
-					Required: 1,
-				}
-
-				createTxErr := decoder.CreateRawTransaction(wrapper, rawTx)
-				rawTxWithErr := &openwallet.RawTransactionWithError{
-					RawTx: rawTx,
-					Error: openwallet.ConvertError(createTxErr),
-				}
-
-				//创建成功，添加到队列
-				rawTxArray = append(rawTxArray, rawTxWithErr)
-
-				//汇总下一个
-				continue
-
 			}
 
+		} else {
+			if trxBalance.Cmp(big.NewInt(0)) < 0 {
+				makeFeesSupport = true
+				supportAddress = sumRawTx.SummaryAddress
+				//重置为存在
+				exist = true
+
+				decoder.wm.Log.Debugf("use fees support account: %s to recharge summary address", feesSupportAccount.AccountID)
+			}
+		}
+
+		//是否构造手续费支持交易单
+		if makeFeesSupport {
+
+			//通过手续费账户创建交易单
+			feeMini := decoder.wm.Config.FeeMini
+			//supportAddress := addrBalance.Balance.Address
+			supportAmount := decimal.Zero
+			feesSupportScale, _ := decimal.NewFromString(sumRawTx.FeesSupportAccount.FeesSupportScale)
+			fixSupportAmount, _ := decimal.NewFromString(sumRawTx.FeesSupportAccount.FixSupportAmount)
+			//1 Energy = 10 SUN, 1 trx = 1000000 SUN, fees(trx) = Energy * 100000
+			fees := decimal.New(feeMini, 1-decoder.wm.Decimal())
+
+			//优先采用固定支持数量
+			if fixSupportAmount.GreaterThan(decimal.Zero) {
+				supportAmount = fixSupportAmount
+			} else {
+				//没有固定支持数量，有手续费倍率，计算支持数量
+				if feesSupportScale.GreaterThan(decimal.Zero) {
+					supportAmount = feesSupportScale.Mul(fees)
+				} else {
+					//默认支持数量为手续费
+					supportAmount = fees
+				}
+			}
+
+			decoder.wm.Log.Debugf("create transaction for fees support account")
+			decoder.wm.Log.Debugf("fees account: %s", feesSupportAccount.AccountID)
+			decoder.wm.Log.Debugf("mini support amount: %s", fees.String())
+			decoder.wm.Log.Debugf("allow support amount: %s", supportAmount.String())
+			decoder.wm.Log.Debugf("support address: %s", supportAddress)
+
+			supportCoin := openwallet.Coin{
+				Symbol:     sumRawTx.Coin.Symbol,
+				IsContract: false,
+			}
+
+			//创建一笔交易单
+			rawTx := &openwallet.RawTransaction{
+				Coin:    supportCoin,
+				Account: feesSupportAccount,
+				To: map[string]string{
+					supportAddress: supportAmount.String(),
+				},
+				Required: 1,
+			}
+
+			createTxErr := decoder.CreateRawTransaction(wrapper, rawTx)
+			rawTxWithErr := &openwallet.RawTransactionWithError{
+				RawTx: rawTx,
+				Error: openwallet.ConvertError(createTxErr),
+			}
+
+			//创建成功，添加到队列
+			rawTxArray = append(rawTxArray, rawTxWithErr)
+
+			//汇总下一个
+			continue
 		}
 
 		decoder.wm.Log.Debugf("balance: %v", addrBalance.Balance.Balance)

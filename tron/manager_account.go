@@ -147,17 +147,21 @@ func (wm *WalletManager) GetAccount(address string) (account *openwallet.AssetsA
 // Parameters：
 // 	Account address，converted to a base64 string
 // Return value：
-func (wm *WalletManager) GetTRXAccount(address string) (account *Account, err error) {
+func (wm *WalletManager) GetTRXAccount(address string) (account *Account, exist bool, err error) {
 	address = convertAddrToHex(address)
 
 	params := req.Param{"address": address}
 	r, err := wm.WalletClient.Call("/wallet/getaccount", params)
 	if err != nil {
-		return nil, err
+		return nil, false, err
 	}
 	account = NewAccount(r)
 
-	return account, nil
+	if len(account.AddressHex) == 0 {
+		return account, false, nil
+	}
+
+	return account, true, nil
 }
 
 // CreateAccount Done!

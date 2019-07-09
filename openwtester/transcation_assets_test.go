@@ -123,10 +123,11 @@ func TestTransfer_TRX(t *testing.T) {
 	walletID := "WLHdqGtGGZkBHEyXmv1w82s2iZjWJjgWF8"
 	accountID := "4pF3jRC2XokaaLZWiiLvxXrD8SKRYNuzcVCFkJdu6rkt"
 	to := "TRJJ9Mq4aMjdmKWpTDJAgbYNoY2P9Facg5"
+	//to := "TCa3csiJd8Xhx75GPWP9S3kyXX9PonMx7n"
 
 	testGetAssetsAccountBalance(tm, walletID, accountID)
 
-	rawTx, err := testCreateTransactionStep(tm, walletID, accountID, to, "0.03", "", nil)
+	rawTx, err := testCreateTransactionStep(tm, walletID, accountID, to, "1.199920", "", nil)
 	if err != nil {
 		return
 	}
@@ -155,7 +156,8 @@ func TestTransfer_TRC20(t *testing.T) {
 	tm := testInitWalletManager()
 	walletID := "WLHdqGtGGZkBHEyXmv1w82s2iZjWJjgWF8"
 	accountID := "4pF3jRC2XokaaLZWiiLvxXrD8SKRYNuzcVCFkJdu6rkt"
-	to := "TRJJ9Mq4aMjdmKWpTDJAgbYNoY2P9Facg5"
+	//to := "TRJJ9Mq4aMjdmKWpTDJAgbYNoY2P9Facg5"
+	to := "TCa3csiJd8Xhx75GPWP9S3kyXX9PonMx7n"
 
 	contract := openwallet.SmartContract{
 		Address:  "THvZvKPLHKLJhEFYKiyqj6j8G8nGgfg7ur",
@@ -194,10 +196,10 @@ func TestTransfer_TRC20(t *testing.T) {
 		return
 	}
 
-	_, err = testSubmitTransactionStep(tm, rawTx)
-	if err != nil {
-		return
-	}
+	//_, err = testSubmitTransactionStep(tm, rawTx)
+	//if err != nil {
+	//	return
+	//}
 
 }
 
@@ -206,7 +208,8 @@ func TestTransfer_TRC10(t *testing.T) {
 	tm := testInitWalletManager()
 	walletID := "WLHdqGtGGZkBHEyXmv1w82s2iZjWJjgWF8"
 	accountID := "4pF3jRC2XokaaLZWiiLvxXrD8SKRYNuzcVCFkJdu6rkt"
-	to := "TRJJ9Mq4aMjdmKWpTDJAgbYNoY2P9Facg5"
+	//to := "TRJJ9Mq4aMjdmKWpTDJAgbYNoY2P9Facg5"
+	to := "TCa3csiJd8Xhx75GPWP9S3kyXX9PonMx7n"
 
 	contract := openwallet.SmartContract{
 		Address:  "1002000",
@@ -236,10 +239,10 @@ func TestTransfer_TRC10(t *testing.T) {
 		return
 	}
 
-	_, err = testSubmitTransactionStep(tm, rawTx)
-	if err != nil {
-		return
-	}
+	//_, err = testSubmitTransactionStep(tm, rawTx)
+	//if err != nil {
+	//	return
+	//}
 
 }
 
@@ -247,8 +250,10 @@ func TestTransfer_TRC10(t *testing.T) {
 func TestSummary(t *testing.T) {
 	tm := testInitWalletManager()
 	walletID := "WGVsUfTTVaCwAMRTqeJiDQsZ3vrWp9DzMA"
-	accountID := "4pF3jRC2XokaaLZWiiLvxXrD8SKRYNuzcVCFkJdu6rkt"
+	//accountID := "4pF3jRC2XokaaLZWiiLvxXrD8SKRYNuzcVCFkJdu6rkt"
+	accountID := "C31rHUi8FJpwhWC2KTb5mMx9LUCSRpNnS1cG2QVMixYN"
 	summaryAddress := "TRJJ9Mq4aMjdmKWpTDJAgbYNoY2P9Facg5"
+	//summaryAddress := "TS11WZyPnT8qidwREcR8VDzNULCXxFeBMa"
 
 	testGetAssetsAccountBalance(tm, walletID, accountID)
 
@@ -289,8 +294,10 @@ func TestSummary(t *testing.T) {
 func TestSummary_TRC10(t *testing.T) {
 	tm := testInitWalletManager()
 	walletID := "WGVsUfTTVaCwAMRTqeJiDQsZ3vrWp9DzMA"
-	accountID := "4pF3jRC2XokaaLZWiiLvxXrD8SKRYNuzcVCFkJdu6rkt"
+	//accountID := "4pF3jRC2XokaaLZWiiLvxXrD8SKRYNuzcVCFkJdu6rkt"
+	accountID := "C31rHUi8FJpwhWC2KTb5mMx9LUCSRpNnS1cG2QVMixYN"
 	summaryAddress := "TRJJ9Mq4aMjdmKWpTDJAgbYNoY2P9Facg5"
+	//summaryAddress := "TS11WZyPnT8qidwREcR8VDzNULCXxFeBMa"
 
 	feesSupport := openwallet.FeesSupportAccount{
 		AccountID: "5Tm3sqFap329wj3Du4DVXMkjAe85FVH3MaB6HSV8joj1",
@@ -349,8 +356,10 @@ func TestSummary_TRC10(t *testing.T) {
 func TestSummary_TRC20(t *testing.T) {
 	tm := testInitWalletManager()
 	walletID := "WGVsUfTTVaCwAMRTqeJiDQsZ3vrWp9DzMA"
-	accountID := "4pF3jRC2XokaaLZWiiLvxXrD8SKRYNuzcVCFkJdu6rkt"
+	//accountID := "4pF3jRC2XokaaLZWiiLvxXrD8SKRYNuzcVCFkJdu6rkt"
+	accountID := "C31rHUi8FJpwhWC2KTb5mMx9LUCSRpNnS1cG2QVMixYN"
 	summaryAddress := "TRJJ9Mq4aMjdmKWpTDJAgbYNoY2P9Facg5"
+	//summaryAddress := "TS11WZyPnT8qidwREcR8VDzNULCXxFeBMa"
 
 	feesSupport := openwallet.FeesSupportAccount{
 		AccountID: "5Tm3sqFap329wj3Du4DVXMkjAe85FVH3MaB6HSV8joj1",
@@ -358,23 +367,23 @@ func TestSummary_TRC20(t *testing.T) {
 		//FeesSupportScale: "1.3",
 	}
 
-	//contract := openwallet.SmartContract{
-	//	Address:  "THvZvKPLHKLJhEFYKiyqj6j8G8nGgfg7ur",
-	//	Symbol:   "TRX",
-	//	Name:     "TRONdice",
-	//	Token:    "DICE",
-	//	Decimals: 6,
-	//	Protocol: "trc20",
-	//}
-
 	contract := openwallet.SmartContract{
-		Address:  "TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t",
+		Address:  "THvZvKPLHKLJhEFYKiyqj6j8G8nGgfg7ur",
 		Symbol:   "TRX",
-		Name:     "Tether USD",
-		Token:    "USDT",
+		Name:     "TRONdice",
+		Token:    "DICE",
 		Decimals: 6,
 		Protocol: "trc20",
 	}
+
+	//contract := openwallet.SmartContract{
+	//	Address:  "TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t",
+	//	Symbol:   "TRX",
+	//	Name:     "Tether USD",
+	//	Token:    "USDT",
+	//	Decimals: 6,
+	//	Protocol: "trc20",
+	//}
 
 	testGetAssetsAccountBalance(tm, walletID, accountID)
 
