@@ -100,7 +100,7 @@ func (decoder *TransactionDecoder) CreateSimpleTransaction(wrapper openwallet.Wa
 	}
 
 	if len(addresses) == 0 {
-		return openwallet.Errorf(openwallet.ErrAccountNotAddress,"[%s] have not addresses", accountID)
+		return openwallet.Errorf(openwallet.ErrAccountNotAddress, "[%s] have not addresses", accountID)
 	}
 
 	searchAddrs := make([]string, 0)
@@ -336,7 +336,7 @@ func (decoder *TransactionDecoder) CreateTokenTransaction(wrapper openwallet.Wal
 
 	if findAddrBalance == nil {
 		if tokenBalanceNotEnough {
-			return openwallet.Errorf(openwallet.ErrInsufficientTokenBalanceOfAddress,"the balance: %s is not enough", amountStr)
+			return openwallet.Errorf(openwallet.ErrInsufficientTokenBalanceOfAddress, "the balance: %s is not enough", amountStr)
 		}
 		if balanceNotEnough {
 			return openwallet.Errorf(openwallet.ErrInsufficientFees, errStr)
@@ -499,6 +499,7 @@ func (decoder *TransactionDecoder) SubmitRawTransaction(wrapper openwallet.Walle
 		AccountID:  rawTx.Account.AccountID,
 		Fees:       rawTx.Fees,
 		SubmitTime: time.Now().Unix(),
+		TxType:     0,
 	}
 	tx.WxID = openwallet.GenTransactionWxID(&tx)
 	return &tx, nil
@@ -657,8 +658,8 @@ func (decoder *TransactionDecoder) CreateSimpleSummaryRawTransaction(wrapper ope
 func (decoder *TransactionDecoder) CreateTokenSummaryRawTransaction(wrapper openwallet.WalletDAI, sumRawTx *openwallet.SummaryRawTransaction) ([]*openwallet.RawTransactionWithError, error) {
 
 	var (
-		rawTxArray = make([]*openwallet.RawTransactionWithError, 0)
-		accountID  = sumRawTx.Account.AccountID
+		rawTxArray         = make([]*openwallet.RawTransactionWithError, 0)
+		accountID          = sumRawTx.Account.AccountID
 		feesSupportAccount *openwallet.AssetsAccount
 	)
 

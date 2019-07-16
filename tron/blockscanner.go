@@ -433,7 +433,6 @@ func (bs *TronBlockScanner) InitTronExtractResult(tx *Contract, result *ExtractR
 		}
 	}
 
-
 	amount := decimal.Zero
 	coin := openwallet.Coin{
 		Symbol:     bs.wm.Symbol(),
@@ -467,6 +466,7 @@ func (bs *TronBlockScanner) InitTronExtractResult(tx *Contract, result *ExtractR
 		To:          []string{tx.To + ":" + amount.String()},
 		Status:      status,
 		Reason:      reason,
+		TxType:      0,
 	}
 
 	wxID := openwallet.GenTransactionWxID(transx)
@@ -520,6 +520,7 @@ func (bs *TronBlockScanner) extractTxInput(tx *Contract, txExtractData *openwall
 	txInput.Recharge.BlockHeight = tx.BlockHeight
 	txInput.Recharge.Index = 0 //账户模型填0
 	txInput.Recharge.CreateAt = time.Now().Unix()
+	txInput.Recharge.TxType = 0
 	txExtractData.TxInputs = append(txExtractData.TxInputs, txInput)
 }
 
@@ -558,6 +559,7 @@ func (bs *TronBlockScanner) extractTxOutput(tx *Contract, txExtractData *openwal
 	txOutput.Recharge.BlockHeight = tx.BlockHeight
 	txOutput.Recharge.Index = 0 //账户模型填0
 	txOutput.Recharge.CreateAt = time.Now().Unix()
+	txOutput.Recharge.TxType = 0
 	txExtractData.TxOutputs = append(txExtractData.TxOutputs, txOutput)
 }
 
