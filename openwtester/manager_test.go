@@ -11,6 +11,8 @@ import (
 var (
 	testApp        = "assets-adapter"
 	configFilePath = filepath.Join("conf")
+	dbFilePath = filepath.Join("data", "db")
+	dbFileName = "blockchain-trx.db"
 )
 
 func testInitWalletManager() *openw.WalletManager {

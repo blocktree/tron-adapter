@@ -19,7 +19,6 @@ import (
 	"fmt"
 	"github.com/shopspring/decimal"
 	"path/filepath"
-	"strings"
 	"time"
 
 	"github.com/asdine/storm"
@@ -112,7 +111,7 @@ func (bs *TronBlockScanner) ScanBlockTask() {
 		currentHash   string
 	)
 	//获取本地区块高度
-	currentHeight, currentHash = bs.GetLocalNewBlock()
+	currentHeight, currentHash, _ = bs.GetLocalNewBlock()
 	//如果本地没有记录，查询接口的高度
 	if currentHeight == 0 {
 		bs.wm.Log.Std.Info("No records found in local, get current block as the local!")
@@ -164,7 +163,7 @@ func (bs *TronBlockScanner) ScanBlockTask() {
 		if err != nil {
 			bs.wm.Log.Std.Info("block scanner can not get new block data; unexpected error: %v", err)
 			//记录未扫区块
-			unscanRecord := NewUnscanRecord(currentHeight, "", err.Error())
+			unscanRecord := openwallet.NewUnscanRecord(currentHeight, "", err.Error(), bs.wm.Symbol())
 			bs.SaveUnscanRecord(unscanRecord)
 			continue
 		}
@@ -253,7 +252,7 @@ func (bs *TronBlockScanner) ScanBlock(height uint64) error {
 	if err != nil {
 		bs.wm.Log.Std.Info("block scanner can not get new block data; unexpected error: %v", err)
 		//记录未扫区块
-		unscanRecord := NewUnscanRecord(height, "", err.Error())
+		unscanRecord := openwallet.NewUnscanRecord(height, "", err.Error(), bs.wm.Symbol())
 		bs.SaveUnscanRecord(unscanRecord)
 		//log.Std.Info("block height: %d extract failed.", height)
 		return err
@@ -288,7 +287,7 @@ func (bs *TronBlockScanner) RescanFailedRecord() {
 		blockMap = make(map[uint64][]string)
 	)
 
-	list, err := bs.wm.GetUnscanRecords()
+	list, err := bs.GetUnscanRecords()
 	if err != nil {
 		bs.wm.Log.Std.Info("block scanner can not get rescan data; unexpected error: %v", err)
 	}
@@ -336,8 +335,6 @@ func (bs *TronBlockScanner) RescanFailedRecord() {
 		bs.wm.DeleteUnscanRecord(height)
 	}
 
-	//删除未没有找到交易记录的重扫记录
-	bs.wm.DeleteUnscanRecordNotFindTX()
 }
 
 //DeleteUnscanRecord 删除指定高度的未扫记录
@@ -572,7 +569,7 @@ func (bs *TronBlockScanner) newExtractDataNotify(height uint64, extractData map[
 				if err != nil {
 					bs.wm.Log.Error("BlockExtractDataNotify unexpected error:", err)
 					//记录未扫区块
-					unscanRecord := NewUnscanRecord(height, "", "ExtractData Notify failed.")
+					unscanRecord := openwallet.NewUnscanRecord(height, "", "ExtractData Notify failed.", bs.wm.Symbol())
 					err = bs.SaveUnscanRecord(unscanRecord)
 					if err != nil {
 						bs.wm.Log.Std.Error("block height: %d, save unscan record failed. unexpected error: %v", height, err.Error())
@@ -619,53 +616,6 @@ func (wm *WalletManager) GetTransaction(txid string, blockhash string, blockheig
 //	return tx, nil
 //}
 
-//获取未扫记录
-func (wm *WalletManager) GetUnscanRecords() ([]*UnscanRecord, error) {
-	//获取本地区块高度
-	db, err := storm.Open(filepath.Join(wm.Config.dbPath, wm.Config.BlockchainFile))
-	if err != nil {
-		return nil, err
-	}
-	defer db.Close()
-
-	var list []*UnscanRecord
-	err = db.All(&list)
-	if err != nil {
-		return nil, err
-	}
-	return list, nil
-}
-
-//DeleteUnscanRecordNotFindTX 删除未没有找到交易记录的重扫记录
-func (wm *WalletManager) DeleteUnscanRecordNotFindTX() error {
-
-	//删除找不到交易单
-	reason := "[-5]No information available about transaction"
-	//获取本地区块高度
-	db, err := storm.Open(filepath.Join(wm.Config.dbPath, wm.Config.BlockchainFile))
-	if err != nil {
-		return err
-	}
-	defer db.Close()
-
-	var list []*UnscanRecord
-	err = db.All(&list)
-	if err != nil {
-		return err
-	}
-
-	tx, err := db.Begin(true)
-	if err != nil {
-		return err
-	}
-	for _, r := range list {
-		if strings.HasPrefix(r.Reason, reason) {
-			tx.DeleteStruct(r)
-		}
-	}
-	return tx.Commit()
-}
-
 //BatchExtractTransaction 批量提取交易单
 //bitcoin 1M的区块链可以容纳3000笔交易，批量多线程处理，速度更快
 func (bs *TronBlockScanner) BatchExtractTransaction(blockHeight uint64, blockHash string, blockTime int64, txs []*Transaction) error {
@@ -705,7 +655,7 @@ func (bs *TronBlockScanner) BatchExtractTransaction(blockHeight uint64, blockHas
 				}
 			} else {
 				//记录未扫区块
-				unscanRecord := NewUnscanRecord(height, "", "")
+				unscanRecord := openwallet.NewUnscanRecord(height, "", "", bs.wm.Symbol())
 				bs.SaveUnscanRecord(unscanRecord)
 				//log.Std.Info("block height: %d extract failed.", height)
 				failed++ //标记保存失败数
@@ -838,7 +788,7 @@ func (bs *TronBlockScanner) GetCurrentBlockHeader() (*openwallet.BlockHeader, er
 
 //GetScannedBlockHeight 获取已扫区块高度
 func (bs *TronBlockScanner) GetScannedBlockHeight() uint64 {
-	localHeight, _ := bs.GetLocalNewBlock()
+	localHeight, _, _ := bs.GetLocalNewBlock()
 	return localHeight
 }
 
@@ -882,4 +832,10 @@ func (bs *TronBlockScanner) Stop() error {
 func (bs *TronBlockScanner) Restart() error {
 	bs.BlockScannerBase.Restart()
 	return nil
+}
+
+//SupportBlockchainDAI 支持外部设置区块链数据访问接口
+//@optional
+func (bs *TronBlockScanner) SupportBlockchainDAI() bool {
+	return true
 }
