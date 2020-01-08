@@ -26,7 +26,6 @@ import (
 	"time"
 
 	"github.com/blocktree/go-owcdrivers/addressEncoder"
-	"github.com/blocktree/go-owcdrivers/signatureSet"
 	"github.com/blocktree/go-owcrypt"
 	"github.com/blocktree/tron-adapter/tron/grpc-gateway/core"
 	"github.com/golang/protobuf/proto"
@@ -311,13 +310,19 @@ func (wm *WalletManager) SignTransactionRef(hash string, privateKey string) (sig
 		wm.Log.Info("conver privatekey from hex to byte failed;unexpected error:%v", err)
 		return "", err
 	}
-	sign, ret := signatureSet.TronSignature(pk, txHash)
-	if ret != owcrypt.SUCCESS {
-		wm.Log.Infof("sign txHash failed;unexpected error:%v", ret)
-		return "", fmt.Errorf("sign txHash failed")
-	}
+	//sign, ret := signatureSet.TronSignature(pk, txHash)
+	//if ret != owcrypt.SUCCESS {
+	//	wm.Log.Infof("sign txHash failed;unexpected error:%v", ret)
+	//	return "", fmt.Errorf("sign txHash failed")
+	//}
 
-	return hex.EncodeToString(sign), nil
+	signature, v, sigErr := owcrypt.Signature(pk, nil, txHash, owcrypt.ECC_CURVE_SECP256K1)
+	if sigErr != owcrypt.SUCCESS {
+		return "", fmt.Errorf("transaction hash sign failed")
+	}
+	signature = append(signature, v)
+
+	return hex.EncodeToString(signature), nil
 }
 
 func (wm *WalletManager) ValidSignedTokenTransaction(txHex string) error {
@@ -391,9 +396,9 @@ func (wm *WalletManager) validSignedTokenTransaction(txHash []byte, signature []
 	if ret != owcrypt.SUCCESS {
 		return fmt.Errorf("verify SignedTransactionRef faild: recover Pubkey error")
 	}
-	if owcrypt.SUCCESS != owcrypt.Verify(pkBytes, nil, 0, txHash, 32, signature[0:len(signature)-1], wm.CurveType()) {
-		return fmt.Errorf("verify SignedTransactionRef failed:verify signature failed")
-	}
+	//if owcrypt.SUCCESS != owcrypt.Verify(pkBytes, nil, 0, txHash, 32, signature[0:len(signature)-1], wm.CurveType()) {
+	//	return fmt.Errorf("verify SignedTransactionRef failed:verify signature failed")
+	//}
 	pkHash := owcrypt.Hash(pkBytes, 0, owcrypt.HASH_ALG_KECCAK256)[12:32]
 	pkgenAddress := append(codeType.Prefix, pkHash...)
 	pkgenAddressHex := hex.EncodeToString(pkgenAddress)
@@ -444,9 +449,9 @@ func (wm *WalletManager) ValidSignedTransactionRef(txHex string) error {
 		if ret != owcrypt.SUCCESS {
 			return fmt.Errorf("verify SignedTransactionRef faild: recover Pubkey error")
 		}
-		if owcrypt.SUCCESS != owcrypt.Verify(pkBytes, nil, 0, txHash, 32, tx.Signature[i][0:len(tx.Signature[i])-1], wm.CurveType()) {
-			return fmt.Errorf("verify SignedTransactionRef failed:verify signature failed")
-		}
+		//if owcrypt.SUCCESS != owcrypt.Verify(pkBytes, nil, 0, txHash, 32, tx.Signature[i][0:len(tx.Signature[i])-1], wm.CurveType()) {
+		//	return fmt.Errorf("verify SignedTransactionRef failed:verify signature failed")
+		//}
 		pkHash := owcrypt.Hash(pkBytes, 0, owcrypt.HASH_ALG_KECCAK256)[12:32]
 		pkgenAddress := append([]byte{0x41}, pkHash...)
 		pkgenAddressHex := hex.EncodeToString(pkgenAddress)

@@ -960,6 +960,7 @@ func (decoder *TransactionDecoder) createRawTransaction(
 		EccType: decoder.wm.Config.CurveType,
 		Address: addr,
 		Message: txHash,
+		RSV:     true,
 	}
 	keySignList = append(keySignList, &signature)
 
