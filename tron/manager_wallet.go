@@ -16,7 +16,7 @@
 package tron
 
 import (
-	"github.com/blocktree/openwallet/common"
+	"github.com/blocktree/openwallet/v2/common"
 	"github.com/shopspring/decimal"
 )
 

@@ -22,8 +22,8 @@ import (
 	"time"
 
 	"github.com/asdine/storm"
-	"github.com/blocktree/openwallet/common"
-	"github.com/blocktree/openwallet/openwallet"
+	"github.com/blocktree/openwallet/v2/common"
+	"github.com/blocktree/openwallet/v2/openwallet"
 	"github.com/graarh/golang-socketio"
 	"github.com/imroc/req"
 )
@@ -365,7 +365,7 @@ func (bs *TronBlockScanner) newBlockNotify(block *Block, isFork bool) {
 }
 
 //提取交易单
-func (bs *TronBlockScanner) ExtractTransaction(blockHeight uint64, blockHash string, blockTime int64, trx *Transaction, scanAddressFunc openwallet.BlockScanAddressFunc) ExtractResult {
+func (bs *TronBlockScanner) ExtractTransaction(blockHeight uint64, blockHash string, blockTime int64, trx *Transaction, scanAddressFunc openwallet.BlockScanTargetFuncV2) ExtractResult {
 	var (
 		success = true
 		result  = ExtractResult{
@@ -380,22 +380,31 @@ func (bs *TronBlockScanner) ExtractTransaction(blockHeight uint64, blockHash str
 
 		//bs.wm.Log.Std.Info("block scanner scanning tx: %+v", txid)
 		//订阅地址为交易单中的发送者
-		accountId, ok1 := scanAddressFunc(contractTRX.From)
+
+		targetResult1 := scanAddressFunc(openwallet.ScanTargetParam{
+			ScanTarget:     contractTRX.From,
+			Symbol:         bs.wm.Symbol(),
+			ScanTargetType: openwallet.ScanTargetTypeAccountAddress,
+		})
 		//订阅地址为交易单中的接收者
-		accountId2, ok2 := scanAddressFunc(contractTRX.To)
+		targetResult2 := scanAddressFunc(openwallet.ScanTargetParam{
+			ScanTarget:     contractTRX.To,
+			Symbol:         bs.wm.Symbol(),
+			ScanTargetType: openwallet.ScanTargetTypeAccountAddress,
+		})
 
 		//相同账户
-		if accountId == accountId2 && len(accountId) > 0 && len(accountId2) > 0 {
-			contractTRX.SourceKey = accountId
+		if targetResult1.SourceKey == targetResult2.SourceKey && len(targetResult1.SourceKey) > 0 && len(targetResult2.SourceKey) > 0 {
+			contractTRX.SourceKey = targetResult1.SourceKey
 			bs.InitTronExtractResult(contractTRX, &result, 0)
 		} else {
-			if ok1 {
-				contractTRX.SourceKey = accountId
+			if targetResult1.Exist {
+				contractTRX.SourceKey = targetResult1.SourceKey
 				bs.InitTronExtractResult(contractTRX, &result, 1)
 			}
 
-			if ok2 {
-				contractTRX.SourceKey = accountId2
+			if targetResult2.Exist {
+				contractTRX.SourceKey = targetResult2.SourceKey
 				bs.InitTronExtractResult(contractTRX, &result, 2)
 			}
 		}
@@ -421,6 +430,7 @@ func (bs *TronBlockScanner) InitTronExtractResult(tx *Contract, result *ExtractR
 
 	status := "1"
 	reason := ""
+	decimals := int32(0)
 
 	//TRC20转账才需要判断ContractRet状态
 	if tx.Type == TriggerSmartContract {
@@ -445,9 +455,11 @@ func (bs *TronBlockScanner) InitTronExtractResult(tx *Contract, result *ExtractR
 			Symbol:     bs.wm.Symbol(),
 			Protocol:   tx.Protocol,
 		}
-		amount = common.IntToDecimals(tx.Amount, 0)
+		amount = common.BigIntToDecimals(tx.Amount, 0)
+		decimals = 0
 	} else {
-		amount = common.IntToDecimals(tx.Amount, bs.wm.Decimal())
+		amount = common.BigIntToDecimals(tx.Amount, bs.wm.Decimal())
+		decimals = bs.wm.Decimal()
 	}
 
 	transx := &openwallet.Transaction{
@@ -456,7 +468,7 @@ func (bs *TronBlockScanner) InitTronExtractResult(tx *Contract, result *ExtractR
 		BlockHash:   tx.BlockHash,
 		BlockHeight: tx.BlockHeight,
 		TxID:        tx.TxID,
-		Decimal:     bs.wm.Decimal(),
+		Decimal:     decimals,
 		Amount:      amount.String(),
 		ConfirmTime: tx.BlockTime,
 		From:        []string{tx.From + ":" + amount.String()},
@@ -501,9 +513,9 @@ func (bs *TronBlockScanner) extractTxInput(tx *Contract, txExtractData *openwall
 			Symbol:     bs.wm.Symbol(),
 			Protocol:   tx.Protocol,
 		}
-		amount = common.IntToDecimals(tx.Amount, 0)
+		amount = common.BigIntToDecimals(tx.Amount, 0)
 	} else {
-		amount = common.IntToDecimals(tx.Amount, bs.wm.Decimal())
+		amount = common.BigIntToDecimals(tx.Amount, bs.wm.Decimal())
 	}
 
 	//主网from交易转账信息，第一个TxInput
@@ -540,9 +552,9 @@ func (bs *TronBlockScanner) extractTxOutput(tx *Contract, txExtractData *openwal
 			Protocol:   tx.Protocol,
 		}
 
-		amount = common.IntToDecimals(tx.Amount, 0)
+		amount = common.BigIntToDecimals(tx.Amount, 0)
 	} else {
-		amount = common.IntToDecimals(tx.Amount, bs.wm.Decimal())
+		amount = common.BigIntToDecimals(tx.Amount, bs.wm.Decimal())
 	}
 
 	//主网to交易转账信息,只有一个TxOutPut
@@ -676,7 +688,7 @@ func (bs *TronBlockScanner) BatchExtractTransaction(blockHeight uint64, blockHas
 			//shouldDone++
 			go func(mBlockHeight uint64, mTx *Transaction, end chan struct{}, mProducer chan<- ExtractResult) {
 				//导出提出的交易
-				mProducer <- bs.ExtractTransaction(mBlockHeight, eBlockHash, eBlockTime, mTx, bs.ScanAddressFunc)
+				mProducer <- bs.ExtractTransaction(mBlockHeight, eBlockHash, eBlockTime, mTx, bs.ScanTargetFuncV2)
 				//释放
 				<-end
 

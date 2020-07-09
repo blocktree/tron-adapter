@@ -17,7 +17,7 @@ package tron
 
 import (
 	"fmt"
-	"github.com/blocktree/openwallet/openwallet"
+	"github.com/blocktree/openwallet/v2/openwallet"
 )
 
 // //GetCurrentBlockHeader 获取当前区块高度
@@ -221,7 +221,6 @@ func (bs *TronBlockScanner) DeleteUnscanRecord(height uint64) error {
 
 	return bs.BlockchainDAI.DeleteUnscanRecordByHeight(height, bs.wm.Symbol())
 }
-
 
 func (bs *TronBlockScanner) GetUnscanRecords() ([]*openwallet.UnscanRecord, error) {
 

@@ -17,7 +17,7 @@ package tron
 
 import (
 	"fmt"
-	"github.com/blocktree/openwallet/log"
+	"github.com/blocktree/openwallet/v2/log"
 	"github.com/golang/protobuf/proto"
 	"github.com/golang/protobuf/ptypes/timestamp"
 	"testing"
@@ -37,17 +37,17 @@ func TestScanBlockTask(t *testing.T) {
 	scanner.ScanBlockTask()
 }
 
-func TestGetUnscanRecords(t *testing.T) {
-	list, err := tw.GetUnscanRecords()
-	if err != nil {
-		t.Errorf("GetUnscanRecords failed unexpected error: %v\n", err)
-		return
-	}
-
-	for _, r := range list {
-		t.Logf("GetUnscanRecords unscan: %v", r)
-	}
-}
+//func TestGetUnscanRecords(t *testing.T) {
+//	list, err := tw.GetUnscanRecords()
+//	if err != nil {
+//		t.Errorf("GetUnscanRecords failed unexpected error: %v\n", err)
+//		return
+//	}
+//
+//	for _, r := range list {
+//		t.Logf("GetUnscanRecords unscan: %v", r)
+//	}
+//}
 
 func TestTronBlockScanner_RescanFailedRecord(t *testing.T) {
 	bs := NewTronBlockScanner(tw)
@@ -110,8 +110,8 @@ func TestTron_GetGlobalMaxBlockHeight(t *testing.T) {
 
 func TestTron_GetTransaction(t *testing.T) {
 	bs := NewTronBlockScanner(tw)
-	txID := "003712cddc2be86184a6b6d396e726d4549975dc6938e5f88bfcb627960886b8"
-	height := uint64(7773685)
+	txID := "33fd023e25bb368f95df530357835852cb5b689848c40b11fc6df0f7e80a1380"
+	height := uint64(21275089)
 	tx, err := bs.wm.GetTransaction(txID, "", height, 0)
 	if err != nil {
 		fmt.Println("get transaction failed!!!")
@@ -119,7 +119,6 @@ func TestTron_GetTransaction(t *testing.T) {
 		fmt.Println("txFrom:=", tx)
 	}
 }
-
 
 func TestDemo(t *testing.T) {
 	name := proto.MessageName(&timestamp.Timestamp{})
@@ -131,17 +130,17 @@ func TestTron_RescanFailedRecord(t *testing.T) {
 	bs.RescanFailedRecord()
 }
 
-func TestTron_GetUnscanRecords(t *testing.T) {
-	list, err := tw.GetUnscanRecords()
-	if err != nil {
-		t.Errorf("GetUnscanRecords failed unexpected error: %v\n", err)
-		return
-	}
-
-	for _, r := range list {
-		t.Logf("GetUnscanRecords unscan: %v", r)
-	}
-}
+//func TestTron_GetUnscanRecords(t *testing.T) {
+//	list, err := tw.GetUnscanRecords()
+//	if err != nil {
+//		t.Errorf("GetUnscanRecords failed unexpected error: %v\n", err)
+//		return
+//	}
+//
+//	for _, r := range list {
+//		t.Logf("GetUnscanRecords unscan: %v", r)
+//	}
+//}
 
 func TestBTCBlockScanner_ScanBlock(t *testing.T) {
 

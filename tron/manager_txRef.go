@@ -18,8 +18,8 @@ package tron
 import (
 	"encoding/hex"
 	"fmt"
-	"github.com/blocktree/openwallet/common"
-	"github.com/blocktree/openwallet/openwallet"
+	"github.com/blocktree/openwallet/v2/common"
+	"github.com/blocktree/openwallet/v2/openwallet"
 	"math/big"
 	"strconv"
 	"strings"
@@ -709,7 +709,6 @@ func (wm *WalletManager) GetTransactionFeeEstimated(from string, data string) (*
 	*/
 	return feeInfo, nil
 }
-
 
 //IsEnoughEnergyToTransferTRC20 是否足够能量转账TRC20
 func (wm *WalletManager) IsEnoughEnergyToTransferTRC20(address string, trxBalance *big.Int) (flag bool, energyRest int64, feeMini int64) {

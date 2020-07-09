@@ -102,9 +102,12 @@ github.com/blocktree/openwallet v1.4.5/go.mod h1:e5IqJ6OqCM5qEN4TTxeeWbd3l3kCRLP
 github.com/blocktree/openwallet v1.4.6 h1:u5rjB/XcMmbFomVaKunVcas1ATNz0wYf7P5HkQD4prM=
 github.com/blocktree/openwallet v1.4.6/go.mod h1:e5IqJ6OqCM5qEN4TTxeeWbd3l3kCRLPC6fG4/KLiA7I=
 github.com/blocktree/openwallet v1.4.8/go.mod h1:e5IqJ6OqCM5qEN4TTxeeWbd3l3kCRLPC6fG4/KLiA7I=
+github.com/blocktree/openwallet v1.5.4 h1:GcwfnaiiGxpRtSuVe83ntGcUyOwSJtK+VxIHbdNKjPo=
 github.com/blocktree/openwallet v1.5.4/go.mod h1:e5IqJ6OqCM5qEN4TTxeeWbd3l3kCRLPC6fG4/KLiA7I=
 github.com/blocktree/openwallet v1.7.0 h1:9FZ+ux9ikZ9I33kcKXoVGUVB80GrBkkwMdCcv3NwncE=
 github.com/blocktree/openwallet v1.7.0/go.mod h1:The2jktcCRbOBcfxYA1/+8TM1zJItluTwZsmhs7yJZE=
+github.com/blocktree/openwallet/v2 v2.0.5 h1:hzOB3/lUFQA1JqXhGLEUbomRVdg/erGQWxMRxBtVszg=
+github.com/blocktree/openwallet/v2 v2.0.5/go.mod h1:ZHgzHHTfDznBttwScFfzWzl5YMigw9w+KRWUq9lsQdc=
 github.com/blocktree/rcproto-adapter v1.0.0 h1:mBDoeqS0KI430gWLdxzmIRo98RhdEN9Avi8R1TEV2rQ=
 github.com/blocktree/rcproto-adapter v1.0.0/go.mod h1:Z24b9N+wPEOsFPGy+WVYa6ERIj5FH4H6eRZkNjMjr4Y=
 github.com/blocktree/ripple-adapter v1.0.3/go.mod h1:9BidhMwPmLjKnyuI7YurlyFCNdX4SzLsXG835q8zfLQ=

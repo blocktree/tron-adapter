@@ -17,8 +17,8 @@ package tron
 
 import (
 	"fmt"
-	"github.com/blocktree/openwallet/common"
-	"github.com/blocktree/openwallet/openwallet"
+	"github.com/blocktree/openwallet/v2/common"
+	"github.com/blocktree/openwallet/v2/openwallet"
 	"github.com/imroc/req"
 	"math/big"
 	"strconv"
@@ -57,9 +57,9 @@ const (
 )
 
 const (
-	TRC20_BALANCE_OF_METHOD = "balanceOf(address)"
-	TRC20_TRANSFER_METHOD_ID   = "a9059cbb"
-	TRX_TRANSFER_EVENT_ID   = "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef"
+	TRC20_BALANCE_OF_METHOD  = "balanceOf(address)"
+	TRC20_TRANSFER_METHOD_ID = "a9059cbb"
+	TRX_TRANSFER_EVENT_ID    = "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef"
 )
 
 const (
@@ -193,7 +193,6 @@ func (wm *WalletManager) GetTRC20Balance(address string, contractAddress string)
 	return 0, nil
 }
 
-
 //GetTokenBalance 获取代币余额
 func (wm *WalletManager) GetTRC10Balance(address string, tokenID string) (int64, error) {
 
@@ -224,9 +223,9 @@ func (decoder *ContractDecoder) GetTokenBalanceByAddress(contract openwallet.Sma
 	for i := 0; i < len(address); i++ {
 		var (
 			balance int64
-			err error
+			err     error
 		)
-		if strings.EqualFold(contract.Protocol, TRC20)  {
+		if strings.EqualFold(contract.Protocol, TRC20) {
 			balance, err = decoder.wm.GetTRC20Balance(address[i], contract.Address)
 			if err != nil {
 				decoder.wm.Log.Errorf("get address[%v] token balance failed, err: %v", address[i], err)
@@ -237,7 +236,6 @@ func (decoder *ContractDecoder) GetTokenBalanceByAddress(contract openwallet.Sma
 				decoder.wm.Log.Errorf("get address[%v] token balance failed, err: %v", address[i], err)
 			}
 		}
-
 
 		tokenBalance := &openwallet.TokenBalance{
 			Contract: &contract,

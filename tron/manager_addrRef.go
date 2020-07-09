@@ -23,12 +23,12 @@ import (
 	"time"
 
 	"github.com/asdine/storm/q"
-	"github.com/blocktree/openwallet/common"
-	"github.com/blocktree/openwallet/common/file"
-	"github.com/blocktree/openwallet/hdkeystore"
-	"github.com/blocktree/openwallet/openwallet"
 	"github.com/blocktree/go-owcdrivers/addressEncoder"
 	"github.com/blocktree/go-owcrypt"
+	"github.com/blocktree/openwallet/v2/common"
+	"github.com/blocktree/openwallet/v2/common/file"
+	"github.com/blocktree/openwallet/v2/hdkeystore"
+	"github.com/blocktree/openwallet/v2/openwallet"
 	"github.com/bndr/gotabulate"
 )
 

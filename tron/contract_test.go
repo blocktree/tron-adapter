@@ -18,8 +18,8 @@ package tron
 import (
 	"encoding/hex"
 	"fmt"
-	"github.com/blocktree/openwallet/log"
-	"github.com/blocktree/openwallet/openwallet"
+	"github.com/blocktree/openwallet/v2/log"
+	"github.com/blocktree/openwallet/v2/openwallet"
 	"math/big"
 	"testing"
 )
@@ -72,7 +72,6 @@ func TestTRC20TransferData(t *testing.T) {
 		return
 	}
 	log.Infof("makeTransactionParameter: %+v", dataHex)
-
 
 	contractAddr := "417EA07B5BE5A0FE26A64ACAF451C8D8653FDB56B6"
 	function := "transfer(address,uint256)"
@@ -174,5 +173,5 @@ func TestParseTransferEvent(t *testing.T) {
 		t.Errorf("ParseTransferEvent failed: %v\n", err)
 		return
 	}
-	log.Infof("%s: %d",to, amount)
+	log.Infof("%s: %d", to, amount)
 }

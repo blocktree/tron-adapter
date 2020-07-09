@@ -18,11 +18,12 @@ package tron
 import (
 	"encoding/hex"
 	"fmt"
-	"github.com/blocktree/openwallet/crypto"
-	"github.com/blocktree/openwallet/openwallet"
+	"github.com/blocktree/openwallet/v2/common"
+	"github.com/blocktree/openwallet/v2/crypto"
+	"github.com/blocktree/openwallet/v2/openwallet"
 	"github.com/shopspring/decimal"
 	"github.com/tidwall/gjson"
-	"strconv"
+	"math/big"
 )
 
 type Block struct {
@@ -138,7 +139,7 @@ type Contract struct {
 	ContractName    []byte
 	From            string
 	To              string
-	Amount          int64
+	Amount          *big.Int
 	ContractAddress string
 	SourceKey       string
 	ContractRet     string
@@ -164,7 +165,8 @@ func NewContract(json gjson.Result, isTestnet bool) *Contract {
 		if err != nil {
 			return &Contract{}
 		}
-		b.Amount = b.Parameter.Get("value.amount").Int()
+		b.Amount = common.StringNumToBigIntWithExp(b.Parameter.Get("value.amount").String(), 0)
+		//b.Amount = b.Parameter.Get("value.amount").Int()
 		b.Protocol = ""
 	case TransferAssetContract: //TRC10
 
@@ -176,7 +178,8 @@ func NewContract(json gjson.Result, isTestnet bool) *Contract {
 		if err != nil {
 			return &Contract{}
 		}
-		b.Amount = b.Parameter.Get("value.amount").Int()
+		b.Amount = common.StringNumToBigIntWithExp(b.Parameter.Get("value.amount").String(), 0)
+		//b.Amount = b.Parameter.Get("value.amount").Int()
 		assetsByte, err := hex.DecodeString(b.Parameter.Get("value.asset_name").String())
 		if err != nil {
 			return &Contract{}
@@ -212,7 +215,7 @@ func NewContract(json gjson.Result, isTestnet bool) *Contract {
 	return b
 }
 
-func ParseTransferEvent(data string) (string, int64, error) {
+func ParseTransferEvent(data string) (string, *big.Int, error) {
 
 	const (
 		TransferDataLength = 68 * 2
@@ -220,21 +223,25 @@ func ParseTransferEvent(data string) (string, int64, error) {
 
 	var (
 		to     string
-		amount int64
+		amount = big.NewInt(0)
 	)
 
 	if len(data) != TransferDataLength {
-		return "", 0, fmt.Errorf("call data is not transfer")
+		return "", amount, fmt.Errorf("call data is not transfer")
 	}
 	if data[0:8] != TRC20_TRANSFER_METHOD_ID {
-		return "", 0, fmt.Errorf("call method is not transfer")
+		return "", amount, fmt.Errorf("call method is not transfer")
 	}
 	to = data[32:72]
-	amount, err := strconv.ParseInt(data[72:], 16, 64)
-	if err != nil {
-		return "", 0, err
-	}
+	amount, _ = new(big.Int).SetString(data[72:], 16)
+	//log.Infof("bigAmount = %s", bigAmount.String())
 	return to, amount, nil
+
+	//amount, err := strconv.ParseInt(data[72:], 16, 64)
+	//if err != nil {
+	//	return "", 0, err
+	//}
+	//return to, amount, nil
 }
 
 type Transaction struct {

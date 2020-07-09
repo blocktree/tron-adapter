@@ -20,8 +20,8 @@ import (
 	"errors"
 	"log"
 
-	"github.com/blocktree/openwallet/openwallet"
 	"github.com/blocktree/go-owcdrivers/addressEncoder"
+	"github.com/blocktree/openwallet/v2/openwallet"
 	"github.com/imroc/req"
 	"github.com/tidwall/gjson"
 )
@@ -71,7 +71,6 @@ func (wm *WalletManager) GetAccountResource(address string) (*AccountResource, e
 	res := NewAccountResource(r)
 	return res, nil
 }
-
 
 //deprecated
 // GetAccount Done!
@@ -140,7 +139,6 @@ func (wm *WalletManager) GetAccount(address string) (account *openwallet.AssetsA
 
 	return account, nil
 }
-
 
 // GetAccount Done!
 // Function：Query bandwidth information.

@@ -18,7 +18,7 @@ package tron
 import (
 	"encoding/hex"
 	"fmt"
-	"github.com/blocktree/openwallet/common"
+	"github.com/blocktree/openwallet/v2/common"
 	"github.com/blocktree/tron-adapter/tron/grpc-gateway/core"
 	"github.com/golang/protobuf/proto"
 	"math/big"
@@ -26,7 +26,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/blocktree/openwallet/openwallet"
+	"github.com/blocktree/openwallet/v2/openwallet"
 	"github.com/shopspring/decimal"
 	// "github.com/blocktree/openwallet/assets/qtum/btcLikeTxDriver"
 	// "github.com/blocktree/openwallet/log"
