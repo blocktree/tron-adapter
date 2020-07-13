@@ -472,7 +472,7 @@ type Account struct {
 	AddressHex          string
 	Balance             int64
 	FreeNetUsage        int64
-	AssetV2             map[string]int64
+	AssetV2             map[string]*big.Int
 	FreeAssetNetUsageV2 map[string]int64
 
 	/*
@@ -509,11 +509,11 @@ func NewAccount(json *gjson.Result) *Account {
 	obj.Balance = json.Get("balance").Int()
 	obj.FreeNetUsage = json.Get("free_net_usage").Int()
 
-	obj.AssetV2 = make(map[string]int64, 0)
+	obj.AssetV2 = make(map[string]*big.Int, 0)
 	assetV2 := json.Get("assetV2")
 	if assetV2.IsArray() {
 		for _, as := range assetV2.Array() {
-			obj.AssetV2[as.Get("key").String()] = as.Get("value").Int()
+			obj.AssetV2[as.Get("key").String()] = common.StringNumToBigIntWithExp(as.Get("value").String(), 0)
 		}
 	}
 

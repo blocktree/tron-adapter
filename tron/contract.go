@@ -21,7 +21,6 @@ import (
 	"github.com/blocktree/openwallet/v2/openwallet"
 	"github.com/imroc/req"
 	"math/big"
-	"strconv"
 	"strings"
 )
 
@@ -151,16 +150,16 @@ func (wm *WalletManager) GetContractInfo(contractAddress string) (*ContractInfo,
 }
 
 //GetTokenBalance 获取代币余额
-func (wm *WalletManager) GetTRC20Balance(address string, contractAddress string) (int64, error) {
+func (wm *WalletManager) GetTRC20Balance(address string, contractAddress string) (*big.Int, error) {
 
 	from, _, err := DecodeAddress(address, wm.Config.IsTestNet)
 	if err != nil {
-		return 0, err
+		return big.NewInt(0), err
 	}
 
 	caddr, _, err := DecodeAddress(contractAddress, wm.Config.IsTestNet)
 	if err != nil {
-		return 0, err
+		return big.NewInt(0), err
 	}
 	param, err := makeTransactionParameter("", []SolidityParam{
 		SolidityParam{
@@ -169,7 +168,7 @@ func (wm *WalletManager) GetTRC20Balance(address string, contractAddress string)
 		},
 	})
 	if err != nil {
-		return 0, err
+		return big.NewInt(0), err
 	}
 
 	tx, err := wm.TriggerSmartContract(
@@ -180,25 +179,26 @@ func (wm *WalletManager) GetTRC20Balance(address string, contractAddress string)
 		0,
 		from)
 	if err != nil {
-		return 0, err
+		return big.NewInt(0), err
 	}
 
 	if len(tx.ConstantResult) > 0 {
-		balance, err := strconv.ParseInt(tx.ConstantResult[0], 16, 64)
+		balance, err := common.StringValueToBigInt(tx.ConstantResult[0], 16)
+		//balance, err := strconv.ParseInt(tx.ConstantResult[0], 16, 64)
 		if err != nil {
-			return 0, err
+			return big.NewInt(0), err
 		}
 		return balance, nil
 	}
-	return 0, nil
+	return big.NewInt(0), nil
 }
 
 //GetTokenBalance 获取代币余额
-func (wm *WalletManager) GetTRC10Balance(address string, tokenID string) (int64, error) {
+func (wm *WalletManager) GetTRC10Balance(address string, tokenID string) (*big.Int, error) {
 
 	a, _, err := wm.GetTRXAccount(address)
 	if err != nil {
-		return 0, err
+		return big.NewInt(0), err
 	}
 
 	return a.AssetV2[tokenID], nil
@@ -222,7 +222,7 @@ func (decoder *ContractDecoder) GetTokenBalanceByAddress(contract openwallet.Sma
 
 	for i := 0; i < len(address); i++ {
 		var (
-			balance int64
+			balance *big.Int
 			err     error
 		)
 		if strings.EqualFold(contract.Protocol, TRC20) {
@@ -242,8 +242,8 @@ func (decoder *ContractDecoder) GetTokenBalanceByAddress(contract openwallet.Sma
 			Balance: &openwallet.Balance{
 				Address:          address[i],
 				Symbol:           contract.Symbol,
-				Balance:          common.IntToDecimals(balance, int32(contract.Decimals)).String(),
-				ConfirmBalance:   common.IntToDecimals(balance, int32(contract.Decimals)).String(),
+				Balance:          common.BigIntToDecimals(balance, int32(contract.Decimals)).String(),
+				ConfirmBalance:   common.BigIntToDecimals(balance, int32(contract.Decimals)).String(),
 				UnconfirmBalance: "0",
 			},
 		}
