@@ -16,6 +16,7 @@
 package tron
 
 import (
+	"encoding/hex"
 	"fmt"
 	"github.com/blocktree/openwallet/v2/common"
 	"github.com/blocktree/openwallet/v2/openwallet"
@@ -189,6 +190,9 @@ func (wm *WalletManager) GetTRC20Balance(address string, contractAddress string)
 			return big.NewInt(0), err
 		}
 		return balance, nil
+	} else {
+		nameBytes, _ := hex.DecodeString(tx.Result.Message)
+		return big.NewInt(0), fmt.Errorf(string(nameBytes))
 	}
 	return big.NewInt(0), nil
 }
@@ -234,6 +238,20 @@ func (decoder *ContractDecoder) GetTokenBalanceByAddress(contract openwallet.Sma
 			balance, err = decoder.wm.GetTRC10Balance(address[i], contract.Address)
 			if err != nil {
 				decoder.wm.Log.Errorf("get address[%v] token balance failed, err: %v", address[i], err)
+			}
+		}
+
+		if err != nil {
+			if strings.EqualFold(contract.Protocol, TRC20) {
+				balance, err = decoder.wm.GetTRC20Balance(address[i], contract.Address)
+				if err != nil {
+					decoder.wm.Log.Errorf("get address[%v] token balance failed, err: %v", address[i], err)
+				}
+			} else if strings.EqualFold(contract.Protocol, TRC10) {
+				balance, err = decoder.wm.GetTRC10Balance(address[i], contract.Address)
+				if err != nil {
+					decoder.wm.Log.Errorf("get address[%v] token balance failed, err: %v", address[i], err)
+				}
 			}
 		}
 
