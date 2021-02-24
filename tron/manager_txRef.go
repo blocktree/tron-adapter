@@ -719,8 +719,8 @@ func (wm *WalletManager) IsEnoughEnergyToTransferTRC20(address string, trxBalanc
 	}
 
 	energyRest = res.EnergyLimit - res.EnergyUsed
-	//1 Energy = 10 SUN
-	trxEnergy := trxBalance.Div(trxBalance, big.NewInt(10)).Int64()
+	//1 Energy = 140 SUN
+	trxEnergy := trxBalance.Div(trxBalance, big.NewInt(140)).Int64()
 	energyRest = energyRest + trxEnergy
 	//能量少于下限
 	if energyRest < feeMini {

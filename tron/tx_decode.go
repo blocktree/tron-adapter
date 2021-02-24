@@ -299,6 +299,8 @@ func (decoder *TransactionDecoder) CreateTokenTransaction(wrapper openwallet.Wal
 		if addrBalance_dec.LessThan(amountDec) {
 			tokenBalanceNotEnough = true
 			continue
+		} else {
+			tokenBalanceNotEnough = false
 		}
 
 		//目标地址不存在，总消耗要加0.1
@@ -805,8 +807,8 @@ func (decoder *TransactionDecoder) CreateTokenSummaryRawTransaction(wrapper open
 			supportAmount := decimal.Zero
 			feesSupportScale, _ := decimal.NewFromString(sumRawTx.FeesSupportAccount.FeesSupportScale)
 			fixSupportAmount, _ := decimal.NewFromString(sumRawTx.FeesSupportAccount.FixSupportAmount)
-			//1 Energy = 10 SUN, 1 trx = 1000000 SUN, fees(trx) = Energy * 100000
-			fees := decimal.New(feeMini, 1-decoder.wm.Decimal())
+			//1 Energy = 140 SUN, 1 trx = 1000000 SUN, fees(trx) = Energy * 100000
+			fees := decimal.New(feeMini * 140, -decoder.wm.Decimal())
 
 			//优先采用固定支持数量
 			if fixSupportAmount.GreaterThan(decimal.Zero) {

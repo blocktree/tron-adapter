@@ -162,7 +162,7 @@ func TestWalletManager_GetTokenBalanceByAddress(t *testing.T) {
 }
 
 func TestEncodeName(t *testing.T) {
-	nameBytes, _ := hex.DecodeString("31303031343636")
+	nameBytes, _ := hex.DecodeString("636c617373206f72672e74726f6e2e636f72652e766d2e70726f6772616d2e50726f6772616d244f75744f6654696d65457863657074696f6e203a204350552074696d656f757420666f7220274a554d504445535427206f7065726174696f6e20657865637574696e67")
 	fmt.Println(string(nameBytes))
 }
 

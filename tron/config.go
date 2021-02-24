@@ -47,7 +47,7 @@ const (
 	Decimals                = 6
 	SUN               int64 = 1             //最小单位
 	TRX               int64 = SUN * 1000000 //1 TRX = 1000000 * sun
-	GasPrice                = SUN * 10
+	GasPrice                = SUN * 140
 	CreateAccountCost       = SUN * 100000 //0.1 TRX = 100000 * sun
 )
 
@@ -106,9 +106,9 @@ type WalletConfig struct {
 	CoinDecimal decimal.Decimal
 	//后台数据源类型
 	RPCServerType int
-	//FeeLimit 智能合约最大能量消耗限制，1 Energy = 10 SUN
+	//FeeLimit 智能合约最大能量消耗限制，1 Energy = 140 SUN
 	FeeLimit int64
-	//FeeMini 智能合约最小能量消耗起，1 Energy = 10 SUN
+	//FeeMini 智能合约最小能量消耗起，1 Energy = 140 SUN
 	FeeMini int64
 	//数据目录
 	DataDir string
