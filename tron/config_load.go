@@ -56,7 +56,7 @@ func (wm *WalletManager) LoadConfig() error {
 	} else {
 		wm.Config.WalletDataPath = c.String("mainNetDataPath")
 	}
-
+	wm.Config.IgnoreDustTRX, _ = decimal.NewFromString(c.String("ignoreDustTRX"))
 	wm.WalletClient = NewClient(wm.Config.ServerAPI, "", false)
 
 	return nil
@@ -88,6 +88,7 @@ func (wm *WalletManager) LoadAssetsConfig(c config.Configer) error {
 
 	wm.WalletClient = NewClient(wm.Config.ServerAPI, "", false)
 	wm.Config.DataDir = c.String("dataDir")
+	wm.Config.IgnoreDustTRX, _ = decimal.NewFromString(c.String("ignoreDustTRX"))
 
 	//数据文件夹
 	wm.Config.makeDataDir()

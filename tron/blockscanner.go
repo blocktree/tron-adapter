@@ -577,6 +577,11 @@ func (bs *TronBlockScanner) newExtractDataNotify(height uint64, extractData map[
 	for o, _ := range bs.Observers {
 		for key, array := range extractData {
 			for _, data := range array {
+				//忽略粉尘交易
+				amount, _ := decimal.NewFromString(data.Transaction.Amount)
+				if !data.Transaction.Coin.IsContract && amount.LessThan(bs.wm.Config.IgnoreDustTRX) {
+					continue
+				}
 				err := o.BlockExtractDataNotify(key, data)
 				if err != nil {
 					bs.wm.Log.Error("BlockExtractDataNotify unexpected error:", err)

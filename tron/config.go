@@ -112,6 +112,8 @@ type WalletConfig struct {
 	FeeMini int64
 	//数据目录
 	DataDir string
+	//Ignore the dust trade
+	IgnoreDustTRX decimal.Decimal
 }
 
 //NewConfig Create config instance
