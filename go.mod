@@ -16,7 +16,7 @@ require (
 	github.com/grpc-ecosystem/grpc-gateway v1.8.5
 	github.com/imroc/req v0.2.4
 	github.com/shopspring/decimal v0.0.0-20200105231215-408a2507e114
-	github.com/tidwall/gjson v1.6.5
+	github.com/tidwall/gjson v1.9.3
 	google.golang.org/genproto v0.0.0-20190404172233-64821d5d2107
 	google.golang.org/grpc v1.19.1
 )
